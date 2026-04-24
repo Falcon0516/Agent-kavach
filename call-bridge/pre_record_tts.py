@@ -35,21 +35,21 @@ def generate_audio(filename: str, text: str, rate: int = 155):
 
     if os.path.exists(filepath):
         size = os.path.getsize(filepath)
-        print(f"  [✓] Generated {filename} — {size:,} bytes")
+        print(f"  [OK] Generated {filename} -- {size:,} bytes")
     else:
-        print(f"  [✗] Failed to generate {filename}")
+        print(f"  [FAIL] Failed to generate {filename}")
 
     return filepath
 
 
 def main():
     print("=" * 60)
-    print("  KAVACH PRE-RECORD TTS — GENERATING FALLBACK AUDIO")
+    print("  KAVACH PRE-RECORD TTS -- GENERATING FALLBACK AUDIO")
     print(f"  Output: {RECORDINGS_DIR}")
     print("=" * 60)
     print()
 
-    # ── 1. Full Threat Brief (~12 seconds) ──────────────────────────
+    # -- 1. Full Threat Brief (~12 seconds) --------------------------
     threat_brief = (
         "KAVACH ALERT. KAVACH ALERT. "
         "This is the KAVACH AI Safety System. "
@@ -80,14 +80,14 @@ def main():
     generate_audio("kavach_followup.wav", followup, rate=155)
 
     print()
-    print("━" * 60)
+    print("-" * 60)
     print("  All audio fallbacks generated.")
     print()
     print("  To play (Windows):")
     print(f'    start {os.path.join(RECORDINGS_DIR, "kavach_threat_brief.wav")}')
     print()
     print("  Use these as fallback if Phone Link or VB-Cable fails.")
-    print("━" * 60)
+    print("-" * 60)
 
 
 if __name__ == "__main__":

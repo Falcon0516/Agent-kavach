@@ -42,7 +42,7 @@ def check(name: str, passed: bool, detail: str = ""):
     status = PASS if passed else FAIL
     msg = f"  {status}  {name}"
     if detail:
-        msg += f"  —  {detail}"
+        msg += f"  --  {detail}"
     print(msg)
     results.append((name, passed, detail))
     return passed
@@ -50,12 +50,12 @@ def check(name: str, passed: bool, detail: str = ""):
 
 def main():
     print("=" * 60)
-    print("  KAVACH HEALTH CHECK — PRE-DEMO VERIFICATION")
+    print("  KAVACH HEALTH CHECK -- PRE-DEMO VERIFICATION")
     print(f"  Backend target: http://{MSI_IP}:8000")
     print("=" * 60)
     print()
 
-    # ── 1. MSI Backend ──────────────────────────────────────────────
+    # -- 1. MSI Backend -----------------------------------------------
     try:
         resp = requests.get(f"http://{MSI_IP}:8000/", timeout=5)
         check("MSI Backend", resp.status_code == 200, f"HTTP {resp.status_code}")
@@ -142,30 +142,44 @@ def main():
     else:
         check("Phone Link Screenshots", False, "screenshots/ directory not found")
 
-    # ── 8. Recordings Directory ─────────────────────────────────────
+    # -- 8. Recordings Directory -------------------------------------
     if os.path.isdir(RECORDINGS_DIR):
         files = [f for f in os.listdir(RECORDINGS_DIR) if f != ".gitkeep"]
         check("Recordings Directory", True, f"{len(files)} recording(s)")
     else:
         check("Recordings Directory", False, "recordings/ directory not found")
 
-    # ── 9. VB-Cable Reminder ────────────────────────────────────────
+    # -- 9. outbound_queue.json ---------------------------------------
+    queue_file = os.path.join(os.path.dirname(__file__), "outbound_queue.json")
+    if os.path.exists(queue_file):
+        try:
+            with open(queue_file, "r") as f:
+                json.load(f)
+            check("outbound_queue.json", True, "Exists and is valid JSON")
+        except json.JSONDecodeError:
+            check("outbound_queue.json", False, "Exists but invalid JSON format")
+        except Exception as e:
+            check("outbound_queue.json", False, f"Error reading file: {e}")
+    else:
+        check("outbound_queue.json", False, "File not found locally")
+
+    # -- 10. VB-Cable Reminder ----------------------------------------
     print()
     print("  [NOTE]  VB-Cable: Manually verify in Windows Sound settings")
     print("          Default Output → CABLE Input (Virtual Audio Cable)")
     print("          This routes pyttsx3 TTS into the Phone Link call.")
     print()
 
-    # ── Final Verdict ───────────────────────────────────────────────
+    # -- Final Verdict --------------------------------------------------------
     failures = [r for r in results if not r[1]]
-    print("━" * 60)
+    print("-" * 60)
     if not failures:
-        print("  ✅  ALL SYSTEMS GO — DEMO READY")
+        print("  OK  ALL SYSTEMS GO -- DEMO READY")
     else:
-        print(f"  ❌  ISSUES DETECTED — FIX BEFORE DEMO ({len(failures)} failure(s))")
+        print(f"  FAIL  ISSUES DETECTED -- FIX BEFORE DEMO ({len(failures)} failure(s))")
         for name, _, detail in failures:
-            print(f"       • {name}: {detail}")
-    print("━" * 60)
+            print(f"       * {name}: {detail}")
+    print("-" * 60)
 
     return len(failures) == 0
 
