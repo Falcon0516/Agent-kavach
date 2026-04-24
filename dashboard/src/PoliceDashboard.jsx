@@ -68,7 +68,7 @@ export default function PoliceDashboard() {
       } catch {}
     }
     poll();
-    const interval = setInterval(poll, 500);
+    const interval = setInterval(poll, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -237,6 +237,32 @@ export default function PoliceDashboard() {
                     </a>
                   )}
                 </div>
+
+                {/* Location Source Display */}
+                <div className="space-y-1 bg-kvh-bg p-2 rounded border border-kvh-border">
+                  {state.trigger_type === 'incoming_call' ? (
+                    <>
+                      <div className="font-mono text-[9px] text-green-400 font-semibold">📍 Network Triangulated Location:</div>
+                      <div className="font-mono text-[10px] text-kvh-text tracking-wider">{victimLat.toFixed(6)}, {victimLon.toFixed(6)}</div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[8px] font-mono font-bold" style={{background: 'rgba(88,166,255,0.15)', color: '#58a6ff', border: '1px solid rgba(88,166,255,0.3)'}}>
+                          METHOD: TDOA / Timing Advance
+                        </span>
+                        {state.location_accuracy_m && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[8px] font-mono" style={{background: 'rgba(147,51,234,0.15)', color: '#a855f7', border: '1px solid rgba(147,51,234,0.3)'}}>
+                            ±{state.location_accuracy_m}m accuracy
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="font-mono text-[9px] text-kvh-text-muted">📍 Device GPS Active:</div>
+                      <div className="font-mono text-[10px] text-kvh-text tracking-wider">{victimLat.toFixed(6)}, {victimLon.toFixed(6)}</div>
+                    </>
+                  )}
+                </div>
+
                 <div className="font-mono text-[9px] text-kvh-text-muted">
                   Victim last seen: {new Date().toLocaleTimeString()} | Location: {victimLat.toFixed(4)}, {victimLon.toFixed(4)}
                 </div>

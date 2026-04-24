@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue } from "firebase/database"; // Realtime Database or Firestore
+import { getDatabase, ref, onValue } from "firebase/database"; // Realtime Database (kept for backward compat)
+import { getFirestore, collection, onSnapshot, doc } from "firebase/firestore"; // Firestore (new)
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -10,4 +11,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// Realtime Database (existing — backward compat)
 export const database = getDatabase(app);
+
+// Firestore (new — for zones, threats, community reports)
+export const firestore = getFirestore(app);

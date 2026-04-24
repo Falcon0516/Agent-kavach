@@ -33,6 +33,8 @@ class KavachState(TypedDict):
     victim_name: str
     victim_phone: str
     caller_phone: str
+    location_accuracy_m: Annotated[int, _last_value]
+    location_source: Annotated[str, _last_value]
 
     # ── AUDIO EVIDENCE ─────────────────────────────────────
     audio_transcript: str

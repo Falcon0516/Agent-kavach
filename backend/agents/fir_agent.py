@@ -142,7 +142,7 @@ async def _call_openrouter(user_message: str) -> str:
     }
 
     payload = {
-        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "model": "google/gemini-flash-1.5:free",
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_message},

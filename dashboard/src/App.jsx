@@ -14,6 +14,11 @@ import NavigationPanel from './components/NavigationPanel';
 import SafeRouteMapPanel from './components/SafeRouteMapPanel';
 import ThreatPanel from './components/ThreatPanel';
 import WhatsAppPanel from './components/WhatsAppPanel';
+import AudioThreatGauge from './components/AudioThreatGauge';
+import AgentStateDiagram from './components/AgentStateDiagram';
+import KavachStateMachine from './components/KavachStateMachine';
+import MomentDiagram from './components/MomentDiagram';
+import SafetyMapEditor from './components/SafetyMapEditor';
 import PoliceDashboard from './PoliceDashboard';
 
 // ═══════════════════════════════════════════════════════════
@@ -73,9 +78,11 @@ function KavachCommandCenter() {
   const [threatZones, setThreatZones] = useState([]);
   const [mapData, setMapData] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  const [lastWsData, setLastWsData] = useState(null);
 
   const wsRef = useRef(null);
   const pollRef = useRef(null);
+  const mockModeRef = useRef(false);
 
   // ─── WebSocket connection ───
   useEffect(() => {
@@ -93,6 +100,7 @@ function KavachCommandCenter() {
           try {
             const data = JSON.parse(event.data);
             setThoughts(prev => [...prev, { ...data, ts: Date.now() }]);
+            if (data.type === 'audio_analysis') setLastWsData(data);
 
             // Auto-show map when navigation completes
             if (data.agent === 'navigation' && data.status === 'complete') {
@@ -128,11 +136,15 @@ function KavachCommandCenter() {
   // ─── Poll /api/full_state every 500ms ───
   useEffect(() => {
     async function pollState() {
+      if (mockModeRef.current) return; // Don't overwrite mock data
       try {
         const res = await fetch(`${API_BASE}/api/full_state`);
         if (res.ok) {
           const data = await res.json();
-          setState(data);
+          setState(prev => {
+            // Merge so we don't lose camera_feeds or other live data
+            return { ...prev, ...data };
+          });
           setAlertActive(data.alert_active || data.threat_level >= 3);
         }
       } catch (e) {
@@ -141,7 +153,7 @@ function KavachCommandCenter() {
     }
 
     pollState();
-    pollRef.current = setInterval(pollState, 500);
+    pollRef.current = setInterval(pollState, 2000);
 
     return () => clearInterval(pollRef.current);
   }, []);
@@ -186,6 +198,7 @@ function KavachCommandCenter() {
   }, []);
 
   const handleReset = useCallback(() => {
+    mockModeRef.current = false;
     setState({});
     setThoughts([]);
     setAlertActive(false);
@@ -194,20 +207,22 @@ function KavachCommandCenter() {
   }, []);
 
   const handleMockSimulation = useCallback(() => {
-    const mockAgents = ['supervisor', 'threat', 'family_alert', 'fir', 'navigation', 'argus', 'ncrb'];
+    mockModeRef.current = true; // Prevent polling from overwriting mock state
     const mockThoughts = [
       { agent: 'supervisor', text: '🛡 KAVACH Pipeline initiated — analyzing threat scenario', status: 'running', duration: 0.2 },
-      { agent: 'threat', text: '⚠ Threat level calculated: 4/5 — STALKING pattern detected', status: 'complete', duration: 1.2 },
+      { agent: 'supervisor', text: '📡 Telecom GMLC resolved location via TDOA (Accuracy: ±110m)', status: 'complete', duration: 0.3 },
       { agent: 'ncrb', text: '📊 NCRB check: HOTSPOT MATCH — Indiranagar 100ft Road (7 cases, 2023)', status: 'complete', duration: 0.1 },
+      { agent: 'threat', text: '⚠ Threat level calculated: 4/5 — STALKING pattern detected', status: 'complete', duration: 1.2 },
       { agent: 'family_alert', text: '📱 WhatsApp alert sent to 3 emergency contacts', status: 'complete', duration: 0.8 },
       { agent: 'fir', text: '📄 FIR KVH-2026-0042 generated — IPC 354D, 506', status: 'complete', duration: 1.5 },
       { agent: 'argus', text: '📷 ARGUS activated — 2 cameras, face detected, no threat objects', status: 'complete', duration: 2.1 },
       { agent: 'navigation', text: '🗺 Safe route computed — +4 min, 87% safer via ARGUS coverage', status: 'complete', duration: 0.9 },
     ];
 
+    setThoughts([]);
     let delay = 0;
-    mockThoughts.forEach((thought, i) => {
-      delay += 400 + Math.random() * 300;
+    mockThoughts.forEach((thought) => {
+      delay += 600 + Math.random() * 400;
       setTimeout(() => {
         setThoughts(prev => [...prev, { ...thought, ts: Date.now() }]);
       }, delay);
@@ -216,10 +231,12 @@ function KavachCommandCenter() {
     // Mock state after thoughts
     setTimeout(() => {
       setState({
+        trigger_type: 'incoming_call',
         threat_level: 4,
         threat_keywords: ['stalking', 'following', 'afraid'],
         threat_confidence: 0.89,
         alert_active: true,
+        completed_agents: ['supervisor', 'threat', 'ncrb', 'family_alert', 'fir', 'argus', 'navigation'],
         fir_text: 'FIR No: KVH-2026-0042\nDate: ' + new Date().toLocaleDateString() + '\n\nCOMPLAINANT STATEMENT:\nThe victim reported being followed by an unknown individual near Indiranagar 100 Feet Road, Bangalore. The suspect was observed making threatening gestures and attempting to approach the victim repeatedly.\n\nSECTIONS APPLIED:\n- IPC Section 354D (Stalking)\n- IPC Section 506 (Criminal Intimidation)\n\nACTION TAKEN:\nImmediate patrol dispatched. ARGUS surveillance activated. Safe route provided to victim.',
         fir_case_number: 'KVH-2026-0042',
         fir_ipc_sections: ['354D', '506'],
@@ -237,10 +254,11 @@ function KavachCommandCenter() {
         },
         argus_active: true,
         camera_feeds: [
-          { id: 'ARGUS-001', active: true, face_detected: true, face_count: 1, group_threat: false, plate_detected: ['KA-05-MN-1234'], threat_objects: [], scene_analysis: 'Single male individual walking toward victim position' },
-          { id: 'ARGUS-002', active: true, face_detected: false, face_count: 0, group_threat: false, plate_detected: [], threat_objects: [], scene_analysis: 'Street clear, normal pedestrian activity' },
+          { id: 'ARGUS-01', active: true, face_detected: true, face_count: 1, group_threat: false, plate_detected: ['KA-05-MN-1234'], threat_objects: [], scene_analysis: 'Single male individual walking toward victim position' },
+          { id: 'ARGUS-02', active: true, face_detected: false, face_count: 0, group_threat: false, plate_detected: [], threat_objects: [], scene_analysis: 'Street clear, normal pedestrian activity' },
         ],
         call_recording_url: null,
+        pipeline_start_ms: Date.now() - 4200,
         agent_timings: {
           supervisor: 0.2,
           threat: 1.2,
@@ -292,15 +310,21 @@ function KavachCommandCenter() {
         onNavigatePolice={() => navigate('/police')}
       />
 
-      {/* ═══════ MAIN 3-COLUMN LAYOUT ═══════ */}
-      <div className="flex-1 flex gap-2 p-2 pt-0 min-h-0">
+      {/* ═══════ MAIN 4-COLUMN LAYOUT ═══════ */}
+      <div className="flex-1 flex gap-1.5 p-1.5 pt-0 min-h-0">
         
-        {/* ──── Column 1: 25% ──── */}
-        <div className="w-[25%] flex flex-col gap-2 min-h-0">
-          <div className="flex-1 min-h-0">
+        {/* ──── Column 1: 20% — Pipeline + State ──── */}
+        <div className="w-[20%] flex flex-col gap-1.5 min-h-0">
+          <div className="h-[32%] min-h-0">
             <AgentGraph state={state} thoughts={thoughts} />
           </div>
-          <div className="h-[35%] min-h-0">
+          <div className="h-[18%] min-h-0">
+            <KavachStateMachine state={state} />
+          </div>
+          <div className="h-[25%] min-h-0">
+            <AgentStateDiagram state={state} />
+          </div>
+          <div className="h-[25%] min-h-0">
             <NCRBPanel
               ncrbHotspotMatch={state.ncrb_hotspot_match}
               ncrbContext={state.ncrb_context}
@@ -309,12 +333,12 @@ function KavachCommandCenter() {
           </div>
         </div>
 
-        {/* ──── Column 2: 45% ──── */}
-        <div className="w-[45%] flex flex-col gap-2 min-h-0">
+        {/* ──── Column 2: 30% — Thoughts + Camera + FIR ──── */}
+        <div className="w-[30%] flex flex-col gap-1.5 min-h-0">
           <div className="flex-1 min-h-0">
             <AgentThoughtPanel thoughts={thoughts} />
           </div>
-          <div className="h-[40%] flex gap-2 min-h-0">
+          <div className="h-[38%] flex gap-1.5 min-h-0">
             <div className="w-1/2">
               <CameraPanel feeds={state.camera_feeds} argusActive={state.argus_active} apiBase={API_BASE} />
             </div>
@@ -322,34 +346,48 @@ function KavachCommandCenter() {
               <FIRPanel
                 firText={state.fir_text}
                 caseNumber={state.fir_case_number}
-                ipcSections={state.fir_ipc_sections}
+                ipcSections={state.fir_ipc_sections || state.ipc_sections}
               />
             </div>
           </div>
         </div>
 
-        {/* ──── Column 3: 30% ──── */}
-        <div className="w-[30%] flex flex-col gap-2 min-h-0">
-          <div className="h-[22%] min-h-0">
+        {/* ──── Column 3: 25% — MOMENT Diagram ──── */}
+        <div className="w-[25%] flex flex-col gap-1.5 min-h-0">
+          <div className="flex-1 min-h-0">
+            <MomentDiagram state={state} thoughts={thoughts} />
+          </div>
+        </div>
+
+        {/* ──── Column 4: 25% — Alerts + Threat + WhatsApp + Nav + Audio ──── */}
+        <div className="w-[25%] flex flex-col gap-1.5 min-h-0">
+          <div className="h-[18%] min-h-0">
             <AlertTimeline thoughts={thoughts} state={state} />
           </div>
-          <div className="h-[22%] min-h-0">
+          <div className="h-[20%] min-h-0">
             <ThreatPanel
               threatLevel={state.threat_level}
-              keywords={state.threat_keywords}
-              confidence={state.threat_confidence}
+              keywords={state.threat_keywords || state.threat_context?.keywords}
+              confidence={state.threat_confidence || state.threat_context?.confidence}
               ncrbMatch={state.ncrb_hotspot_match}
             />
           </div>
-          <div className="h-[22%] min-h-0">
+          <div className="h-[20%] min-h-0">
             <WhatsAppPanel
-              sent={state.whatsapp_sent}
+              sent={state.whatsapp_sent || state.family_alerted}
               sid={state.whatsapp_sid}
               recordingUrl={state.call_recording_url}
             />
           </div>
-          <div className="flex-1 min-h-0">
-            <NavigationPanel result={state.navigation_result} />
+          <div className="h-[18%] min-h-0">
+            <NavigationPanel result={state.navigation_result || (state.nearest_police ? {
+              police: state.nearest_police,
+              hospital: state.nearest_hospital,
+              safe_house: state.nearest_safe_house,
+            } : null)} />
+          </div>
+          <div className="h-[24%] min-h-0">
+            <AudioThreatGauge wsData={lastWsData} />
           </div>
         </div>
       </div>
@@ -387,6 +425,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<KavachCommandCenter />} />
       <Route path="/police" element={<PoliceDashboard />} />
+      <Route path="/map-editor" element={<div className="h-screen bg-kvh-bg p-4"><SafetyMapEditor /></div>} />
     </Routes>
   );
 }

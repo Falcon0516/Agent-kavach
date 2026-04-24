@@ -35,11 +35,12 @@ from PIL import ImageGrab
 from dotenv import load_dotenv
 
 # ── Load .env ────────────────────────────────────────────────────────────────
-load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+load_dotenv(env_path, override=True)
 
 MSI_IP = os.getenv("MSI_IP", "100.64.0.1")
 MI_TAILSCALE_IP = os.getenv("MI_TAILSCALE_IP", "100.64.0.2")
-GROQ_KEY_4 = os.getenv("GROQ_KEY_4", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 RECORDING_DURATION = int(os.getenv("RECORDING_DURATION", "20"))
 SAMPLE_RATE = 16000
 POST_CALL_HOLD = int(os.getenv("POST_CALL_HOLD", "5"))
@@ -168,27 +169,78 @@ def record_ambient_audio(duration_seconds: int = 20) -> bytes:
     return wav_bytes
 
 
-# ── Transcribe with Groq Whisper ────────────────────────────────────────────
+# ── Transcribe with Sarvam API (Kannada/Hindi STT) ─────────────────────────
 
-def transcribe_with_groq(wav_bytes: bytes) -> str:
-    """Transcribe recorded WAV audio using Groq Whisper API."""
-    if not GROQ_KEY_4:
-        print("[⚠] GROQ_KEY_4 not set — skipping transcription")
-        return "Emergency SOS call — audio transcription unavailable (no API key)"
+def transcribe_with_sarvam(wav_bytes: bytes) -> str:
+    """Transcribe recorded WAV audio using Sarvam API (translates Indic to English)."""
+    sarvam_key = os.getenv("SARVAM_API_KEY")
+    if not sarvam_key:
+        print("[⚠] SARVAM_API_KEY not set — skipping transcription")
+        return "Emergency SOS call — audio transcription unavailable"
 
     try:
-        from groq import Groq
-        client = Groq(api_key=GROQ_KEY_4)
-        result = client.audio.transcriptions.create(
-            file=("recording.wav", io.BytesIO(wav_bytes)),
-            model="whisper-large-v3-turbo"
-        )
-        transcript = result.text.strip()
-        print(f"[📝] Transcription complete ({len(transcript)} chars)")
-        return transcript if transcript else "Emergency SOS call — no speech detected"
+        url = "https://api.sarvam.ai/speech-to-text-translate"
+        files = {"file": ("recording.wav", wav_bytes, "audio/wav")}
+        data = {"prompt": ""}
+        headers = {"api-subscription-key": sarvam_key}
+
+        response = requests.post(url, headers=headers, data=data, files=files, timeout=15)
+        if response.status_code == 200:
+            transcript = response.json().get("transcript", "").strip()
+            print(f"[📝] Sarvam Transcription complete ({len(transcript)} chars)")
+            return transcript if transcript else "Emergency SOS call — no speech detected"
+        else:
+            print(f"[⚠] Sarvam STT failed: {response.text}")
+            return "Emergency SOS call — transcription failed"
     except Exception as e:
-        print(f"[⚠] Whisper transcription failed: {e}")
-        return "Emergency SOS call — audio transcription unavailable"
+        print(f"[⚠] Sarvam API Error: {e}")
+        return "Emergency SOS call — transcription error"
+
+# ── Routing TTS (Sarvam TTS) ────────────────────────────────────────────────
+def play_routing_audio(transcript: str):
+    """If transcript contains routing requests, generate and play audio via Sarvam."""
+    if "KSIT" in transcript.upper() and "SJBIT" in transcript.upper():
+        print(f"[🗺️] Routing requested in call. Generating exact directions via Groq...")
+        try:
+            from groq import Groq
+            client = Groq(api_key=GROQ_API_KEY)
+            res = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": "Provide very short, 2-sentence driving directions from KSIT college to SJBIT college in Bangalore. Respond in Hindi."}]
+            )
+            directions_text = res.choices[0].message.content.strip()
+            
+            # Generate TTS
+            print(f"[🗣️] Generating Sarvam TTS for directions: {directions_text}")
+            url = "https://api.sarvam.ai/text-to-speech"
+            headers = {"api-subscription-key": os.getenv("SARVAM_API_KEY"), "Content-Type": "application/json"}
+            data = {
+                "inputs": [directions_text],
+                "target_language_code": "hi-IN",
+                "speaker": "meera",
+                "pitch": 0,
+                "pace": 1.0,
+                "loudness": 1.5,
+                "speech_sample_rate": 8000,
+                "enable_preprocessing": True,
+                "model": "bulbul:v1"
+            }
+            resp = requests.post(url, json=data, headers=headers)
+            if resp.status_code == 200:
+                audio_b64 = resp.json()["audios"][0]
+                audio_bytes = base64.b64decode(audio_b64)
+                
+                # Save and play
+                with open("directions.wav", "wb") as f:
+                    f.write(audio_bytes)
+                import sounddevice as sd
+                import soundfile as sf
+                data, fs = sf.read("directions.wav")
+                sd.play(data, fs)
+                sd.wait()
+                print(f"[✅] Directions played to caller.")
+        except Exception as e:
+            print(f"[⚠] Routing TTS failed: {e}")
 
 
 # ── Save Recording and Notify Backend ───────────────────────────────────────
@@ -231,10 +283,11 @@ def save_recording_and_notify(wav_bytes: bytes, caller_phone: str,
 def fire_kavach_pipeline(caller_phone: str, transcript: str,
                           recording_url: str, session_id: str):
     """POST to MSI backend to trigger the full KAVACH pipeline for an incoming call."""
+    
+    # Notice we do NOT send lat/lon here anymore. 
+    # The phone doesn't know where it is; the network does.
     body = {
         "trigger_type": "incoming_call",
-        "lat": 13.0827,       # Default KSIT coords — keypad phones don't send GPS
-        "lon": 77.5877,
         "timestamp": datetime.now().isoformat(),
         "victim_name": "Keypad Caller",
         "victim_phone": caller_phone,
@@ -249,6 +302,7 @@ def fire_kavach_pipeline(caller_phone: str, transcript: str,
         resp = requests.post(
             f"http://{MSI_IP}:8000/api/incoming_call",
             json=body,
+
             timeout=10,
         )
         resp.raise_for_status()
@@ -345,8 +399,8 @@ def main():
         # Record ambient audio (evidence)
         wav_bytes = record_ambient_audio(duration_seconds=RECORDING_DURATION)
 
-        # Transcribe
-        transcript = transcribe_with_groq(wav_bytes)
+        # Transcribe with Sarvam
+        transcript = transcribe_with_sarvam(wav_bytes)
         print(f"[📝] Transcript: {transcript[:120]}...")
 
         # Save and upload recording
@@ -356,6 +410,9 @@ def main():
 
         # Fire KAVACH pipeline
         fire_kavach_pipeline(caller_id, transcript, recording_url, session_id)
+
+        # Play interactive route instructions if applicable
+        play_routing_audio(transcript)
 
         # Hold briefly, then end call
         print(f"[⏳] Holding {POST_CALL_HOLD}s before ending call...")
