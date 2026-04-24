@@ -1,0 +1,266 @@
+@import 'leaflet/dist/leaflet.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════
+   KAVACH GLOBAL STYLES — Dark GitHub Theme
+   ═══════════════════════════════════════════════════════════ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100vh;
+  overflow: hidden;
+  background: #0d1117;
+  color: #c9d1d9;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════ SCROLLBAR ═══════════════ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #484f58;
+}
+
+/* ═══════════════ CARD BASE ═══════════════ */
+.kvh-card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 12px;
+  overflow: hidden;
+}
+.kvh-card-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ═══════════════ BADGES ═══════════════ */
+.kvh-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.kvh-badge-green {
+  background: rgba(63, 185, 80, 0.15);
+  color: #3fb950;
+  border: 1px solid rgba(63, 185, 80, 0.3);
+}
+.kvh-badge-red {
+  background: rgba(218, 54, 51, 0.15);
+  color: #da3633;
+  border: 1px solid rgba(218, 54, 51, 0.3);
+}
+.kvh-badge-amber {
+  background: rgba(210, 153, 34, 0.15);
+  color: #d29922;
+  border: 1px solid rgba(210, 153, 34, 0.3);
+}
+.kvh-badge-blue {
+  background: rgba(88, 166, 255, 0.15);
+  color: #58a6ff;
+  border: 1px solid rgba(88, 166, 255, 0.3);
+}
+.kvh-badge-purple {
+  background: rgba(204, 93, 232, 0.15);
+  color: #cc5de8;
+  border: 1px solid rgba(204, 93, 232, 0.3);
+}
+
+/* ═══════════════ SVG NODE PULSE ═══════════════ */
+@keyframes nodePulse {
+  0%, 100% { r: 22; opacity: 0.8; }
+  50% { r: 26; opacity: 1; }
+}
+@keyframes nodeGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
+  50% { filter: drop-shadow(0 0 12px currentColor); }
+}
+@keyframes edgeDraw {
+  0% { stroke-dashoffset: 200; }
+  100% { stroke-dashoffset: 0; }
+}
+.svg-node-pulse {
+  animation: nodePulse 2s ease-in-out infinite;
+}
+.svg-node-glow {
+  animation: nodeGlow 2s ease-in-out infinite;
+}
+.svg-edge-draw {
+  stroke-dasharray: 200;
+  animation: edgeDraw 0.8s ease-out forwards;
+}
+
+/* ═══════════════ MAP VICTIM MARKER PULSE ═══════════════ */
+@keyframes victimPulse {
+  0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(218, 54, 51, 0.7); }
+  50% { transform: scale(1.2); opacity: 0.8; box-shadow: 0 0 0 15px rgba(218, 54, 51, 0); }
+  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(218, 54, 51, 0); }
+}
+.victim-marker {
+  width: 20px;
+  height: 20px;
+  background: #da3633;
+  border: 3px solid #ff6b6b;
+  border-radius: 50%;
+  animation: victimPulse 1.5s ease-in-out infinite;
+}
+
+/* ═══════════════ THREAT ZONE MAP PULSE ═══════════════ */
+@keyframes threatZonePulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.3); opacity: 0.2; }
+}
+.threat-zone-pulse {
+  animation: threatZonePulse 1.5s ease-in-out infinite;
+}
+
+/* ═══════════════ SKELETON SHIMMER ═══════════════ */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #161b22 25%, #1f2937 50%, #161b22 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+.skeleton-purple {
+  background: linear-gradient(90deg, #161b22 25%, rgba(204, 93, 232, 0.15) 50%, #161b22 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* ═══════════════ GAUGE ═══════════════ */
+@keyframes gaugeFlash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.gauge-flash {
+  animation: gaugeFlash 0.8s ease-in-out 3;
+}
+
+/* ═══════════════ TYPEWRITER ═══════════════ */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  background: #3fb950;
+  margin-left: 2px;
+  animation: blink 0.8s step-end infinite;
+}
+
+/* ═══════════════ WHATSAPP BUBBLE ═══════════════ */
+.wa-bubble {
+  background: #005c4b;
+  border-radius: 8px 8px 8px 0;
+  padding: 8px 12px;
+  max-width: 280px;
+  position: relative;
+}
+.wa-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 10px 10px;
+  border-color: transparent transparent #005c4b transparent;
+}
+
+/* ═══════════════ LEAFLET OVERRIDES ═══════════════ */
+.leaflet-container {
+  background: #0d1117 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+.leaflet-control-zoom a {
+  background: #161b22 !important;
+  color: #c9d1d9 !important;
+  border-color: #30363d !important;
+}
+.leaflet-popup-content-wrapper {
+  background: #161b22 !important;
+  color: #c9d1d9 !important;
+  border: 1px solid #30363d !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+.leaflet-popup-tip {
+  background: #161b22 !important;
+}
+.leaflet-popup-close-button {
+  color: #8b949e !important;
+}
+
+/* ═══════════════ LAYER TOGGLES ═══════════════ */
+.layer-btn {
+  padding: 4px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  border: 1px solid #30363d;
+  background: #161b22;
+  color: #8b949e;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+.layer-btn:hover {
+  border-color: #58a6ff;
+  color: #c9d1d9;
+}
+.layer-btn.active {
+  background: rgba(88, 166, 255, 0.15);
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+
+/* ═══════════════ ALERT FLASHING ═══════════════ */
+@keyframes alertFlash {
+  0%, 100% { border-color: #da3633; }
+  50% { border-color: #ff6b6b; box-shadow: 0 0 30px rgba(218, 54, 51, 0.3); }
+}
+.alert-border-flash {
+  animation: alertFlash 1s ease-in-out infinite;
+}
