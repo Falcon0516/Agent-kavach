@@ -1,18 +1,10 @@
 [
-  {"id":"H-001","name":"Manipal Hospital Hebbal","lat":13.0462,"lon":77.5972,
-   "phone":"+918028222001","address":"HAL Airport Rd, Hebbal, Bengaluru 560024","emergency":true},
-  {"id":"H-002","name":"Columbia Asia Hebbal","lat":13.0380,"lon":77.5975,
-   "phone":"+918028222002","address":"Kirloskar Business Park, Hebbal, Bengaluru 560024","emergency":true},
-  {"id":"H-003","name":"Fortis Hospital Bannerghatta","lat":12.8889,"lon":77.5979,
-   "phone":"+918028222003","address":"154/9, Bannerghatta Rd, Bengaluru 560076","emergency":true},
-  {"id":"H-004","name":"St. John's Medical College Hospital","lat":12.9283,"lon":77.6213,
-   "phone":"+918028222004","address":"Sarjapur Rd, Koramangala, Bengaluru 560034","emergency":true},
-  {"id":"H-005","name":"Narayana Health City","lat":12.8580,"lon":77.5848,
-   "phone":"+918028222005","address":"258/A, Bommasandra, Bengaluru 560099","emergency":true},
-  {"id":"H-006","name":"Sakra World Hospital","lat":12.9346,"lon":77.6141,
-   "phone":"+918028222006","address":"SY NO 52/2 & 52/3, Devarabeesanahalli, Bengaluru","emergency":true},
-  {"id":"H-007","name":"Apollo Hospital Jayanagar","lat":12.9247,"lon":77.5800,
-   "phone":"+918028222007","address":"154/11, Bannerghatta Main Rd, Bengaluru 560076","emergency":true},
-  {"id":"H-008","name":"BGS Gleneagles Global Hospital","lat":12.9483,"lon":77.5398,
-   "phone":"+918028222008","address":"67, Uttarahalli Main Rd, Bengaluru 560060","emergency":true}
+  {"name":"Manipal Hospital Hebbal","lat":13.0340,"lon":77.5730,"phone":"080-25023456"},
+  {"name":"Apollo Hospital Bannerghatta","lat":12.8991,"lon":77.5981,"phone":"080-26304050"},
+  {"name":"Victoria Hospital","lat":12.9592,"lon":77.5768,"phone":"080-26703591"},
+  {"name":"Fortis Hospital Cunningham Road","lat":12.9902,"lon":77.5924,"phone":"080-66214444"},
+  {"name":"MS Ramaiah Hospital","lat":13.0140,"lon":77.5614,"phone":"080-23360202"},
+  {"name":"St. Johns Medical College","lat":12.9371,"lon":77.6234,"phone":"080-22065001"},
+  {"name":"Narayana Health City","lat":12.8956,"lon":77.6497,"phone":"080-71222222"},
+  {"name":"Columbia Asia Whitefield","lat":12.9698,"lon":77.7375,"phone":"080-71782000"}
 ]

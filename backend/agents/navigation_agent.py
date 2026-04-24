@@ -1,81 +1,39 @@
-"""
-KAVACH Navigation Agent (Agent 04)
-Finds nearest police station, hospital, and safe house.
-Teammate (M3) extends with real routing and safe-route scoring.
-"""
-import logging
+import json
+import os
+import copy
+from tools.location_tool import find_nearest
 
-from tools.location_tool import (
-    find_nearest_police,
-    find_nearest_hospital,
-    find_nearest_safe_house,
-    get_safe_zone_score,
-)
+def push_thought(agent, msg):
+    print(f"[{agent.upper()}] {msg}")
 
-logger = logging.getLogger("kavach.navigation")
-
-push_thought = None
-
-
-def set_push_thought(fn):
-    global push_thought
-    push_thought = fn
-
-
-def _thought(agent: str, msg: str):
-    if push_thought:
-        push_thought(agent, msg)
-    logger.info(f"[{agent}] {msg}")
-
-
-async def navigation_node(state: dict) -> dict:
-    """Find nearest safety facilities and compute safe zone score."""
-    lat = state.get("gps_lat", 13.0827)
-    lon = state.get("gps_lon", 77.5877)
-    timestamp = state.get("timestamp", "")
-
-    _thought("navigation", f"Scanning nearest facilities from ({lat:.4f}, {lon:.4f})...")
+async def navigation_node(state):
+    push_thought("navigation", "Loading Bengaluru location database...")
+    lat, lon = state.get("gps_lat", 13.0827), state.get("gps_lon", 77.5877)
     
-    updates = {}
-
-    # ── Nearest facilities ─────────────────────────────────
-    police = find_nearest_police(lat, lon)
-    hospital = find_nearest_hospital(lat, lon)
-    safe_house = find_nearest_safe_house(lat, lon)
-
-    updates["nearest_police"] = police
-    updates["nearest_hospital"] = hospital
-    updates["nearest_safe_house"] = safe_house
-
-    _thought("navigation", f"🚔 Police: {police.get('name', 'Unknown')} — {police.get('distance_m', '?')}m")
-    _thought("navigation", f"🏥 Hospital: {hospital.get('name', 'Unknown')} — {hospital.get('distance_m', '?')}m")
-    _thought("navigation", f"🏠 Safe House: {safe_house.get('name', 'Unknown')} — {safe_house.get('distance_m', '?')}m")
-
-    # ── Safe zone score ────────────────────────────────────
-    # Determine time slot from timestamp
-    time_slot = "night"  # default
-    try:
-        if timestamp:
-            hour_str = timestamp.split("T")[1][:2] if "T" in timestamp else timestamp[:2]
-            hour = int(hour_str)
-            if 6 <= hour < 12:
-                time_slot = "morning"
-            elif 12 <= hour < 18:
-                time_slot = "afternoon"
-            else:
-                time_slot = "night"
-    except (IndexError, ValueError):
-        pass
-
-    zone_info = get_safe_zone_score(lat, lon, time_slot)
-    _thought("navigation", f"📊 Zone: {zone_info.get('zone', 'Unknown')} | Safety: {zone_info.get('score', 0):.2f} ({time_slot})")
-
-    updates["nav_reasoning"] = (
-        f"Nearest police: {police.get('name')} ({police.get('distance_m')}m), "
-        f"Hospital: {hospital.get('name')} ({hospital.get('distance_m')}m), "
-        f"Safe house: {safe_house.get('name')} ({safe_house.get('distance_m')}m). "
-        f"Zone safety ({time_slot}): {zone_info.get('score', 0):.2f}"
-    )
-
-    updates["completed_agents"] = ["navigation"]
-    return updates
+    data_dir = os.path.join(os.path.dirname(__file__), "..", "data")
+    with open(os.path.join(data_dir, "police_stations.json")) as f:
+        police_stations = json.load(f)
+    with open(os.path.join(data_dir, "safe_houses.json")) as f:
+        safe_houses = json.load(f)
+    with open(os.path.join(data_dir, "hospitals.json")) as f:
+        hospitals = json.load(f)
+        
+    push_thought("navigation", f"GPS: {lat:.4f}, {lon:.4f} — calculating distances")
+    
+    ps = find_nearest(lat, lon, copy.deepcopy(police_stations))
+    h  = find_nearest(lat, lon, copy.deepcopy(hospitals))
+    sh = find_nearest(lat, lon, copy.deepcopy(safe_houses))
+    
+    push_thought("navigation", f"Nearest police: {ps['name']} — {ps['distance_m']}m (~{ps['eta_min']} min)")
+    push_thought("navigation", f"Nearest hospital: {h['name']} — {h['distance_m']}m")
+    push_thought("navigation", f"Nearest safe house: {sh['name']} — {sh['distance_m']}m")
+    push_thought("navigation", "COMPLETE — Navigation calculated")
+    
+    state["nearest_police"]    = ps
+    state["nearest_hospital"]  = h
+    state["nearest_safe_house"] = sh
+    state["nav_reasoning"] = f"Haversine distance from GPS. Police ETA {ps['eta_min']} min."
+    if "completed_agents" not in state:
+        state["completed_agents"] = []
+    state["completed_agents"].append("navigation")
+    return state

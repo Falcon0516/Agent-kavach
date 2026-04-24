@@ -1,1 +1,12 @@
-{}
+{
+  "crime_heads": {
+    "stalking": "Crime Head 4.1 — Stalking/Cyberstalking (IPC 354D)",
+    "assault": "Crime Head 3.2 — Assault on Women (IPC 354)",
+    "harassment": "Crime Head 4.2 — Sexual Harassment (IPC 354A)",
+    "intimidation": "Crime Head 6.1 — Criminal Intimidation (IPC 506)",
+    "group_assault": "Crime Head 3.5 — Group assault on women (IPC 354 + IPC 34)"
+  },
+  "district": "Bengaluru Urban",
+  "reporting_station": "Yelahanka PS",
+  "year": 2026
+}
