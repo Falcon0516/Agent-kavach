@@ -1,0 +1,26 @@
+# KAVACH Call Bridge — Python Dependencies
+# ==========================================
+# Install: pip install -r requirements.txt
+#
+# NOTE: pytesseract also requires the Tesseract binary installed:
+#   Windows: download from https://github.com/UB-Mannheim/tesseract/wiki
+#   Set path in .env: TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+#
+# HOW TO RUN:
+#   Terminal 1: python kavach_call_bridge.py    (outbound calls + callback detector)
+#   Terminal 2: python incoming_call_handler.py (incoming keypad calls)
+#   Both must be running during demo.
+
+pyautogui==0.9.54
+pillow==10.4.0
+pyttsx3==2.90
+requests==2.32.3
+python-dotenv==1.0.1
+playsound==1.2.2
+websocket-client==1.8.0
+sounddevice==0.4.6
+soundfile==0.12.1
+numpy==1.26.4
+groq==0.11.0
+pytesseract==0.3.13
+pywin32==306
