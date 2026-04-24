@@ -7,6 +7,7 @@ import ShakeTrigger from './components/ShakeTrigger';
 import VolumeButtonTrigger from './components/VolumeButtonTrigger';
 import StatusDisplay from './components/StatusDisplay';
 import MapView from './components/MapView';
+import TrustedContacts from './components/TrustedContacts';
 import { sendSMSFallback } from './components/SMSFallback';
 import { HeartbeatService } from './services/HeartbeatService';
 
@@ -117,6 +118,7 @@ export default function App() {
       )}
 
       {screen === 'map' && <MapView />}
+      {screen === 'contacts' && <TrustedContacts />}
 
       <div className="bg-gray-800 p-4 border-t border-gray-700 flex justify-around items-center shadow-[0_-5px_20px_rgba(0,0,0,0.3)] z-[2000]">
         <button onClick={() => setScreen('home')} className={`flex flex-col items-center gap-1 w-20 transition ${screen==='home' ? 'text-pink-500':'text-gray-400 saturate-0'}`}>
@@ -126,6 +128,10 @@ export default function App() {
         <button onClick={() => setScreen('map')} className={`flex flex-col items-center gap-1 w-20 transition ${screen==='map' ? 'text-pink-500':'text-gray-400 saturate-0'}`}>
           <span className="text-2xl drop-shadow-md">🗺</span>
           <span className="text-xs font-semibold tracking-wide">Route</span>
+        </button>
+        <button onClick={() => setScreen('contacts')} className={`flex flex-col items-center gap-1 w-20 transition ${screen==='contacts' ? 'text-pink-500':'text-gray-400 saturate-0'}`}>
+          <span className="text-2xl drop-shadow-md">👥</span>
+          <span className="text-xs font-semibold tracking-wide">Contacts</span>
         </button>
       </div>
     </div>
