@@ -1,1 +1,12 @@
-[]
+[
+  {"name":"Yelahanka PS","lat":13.1007,"lon":77.5963,"phone":"080-22868401","district":"Bengaluru North"},
+  {"name":"Hebbal PS","lat":13.0358,"lon":77.5970,"phone":"080-22868500","district":"Bengaluru North"},
+  {"name":"Jalahalli PS","lat":13.0316,"lon":77.5497,"phone":"080-23283100","district":"Bengaluru West"},
+  {"name":"Koramangala PS","lat":12.9352,"lon":77.6245,"phone":"080-22943300","district":"Bengaluru South"},
+  {"name":"Indiranagar PS","lat":12.9784,"lon":77.6408,"phone":"080-25283100","district":"Bengaluru East"},
+  {"name":"Whitefield PS","lat":12.9698,"lon":77.7499,"phone":"080-22942500","district":"Bengaluru East"},
+  {"name":"Vidhana Soudha PS","lat":12.9793,"lon":77.5906,"phone":"080-22250901","district":"Central"},
+  {"name":"Rajajinagar PS","lat":13.0155,"lon":77.5509,"phone":"080-23320600","district":"Bengaluru West"},
+  {"name":"JP Nagar PS","lat":12.9063,"lon":77.5929,"phone":"080-26580100","district":"Bengaluru South"},
+  {"name":"Electronic City PS","lat":12.8499,"lon":77.6690,"phone":"080-25710100","district":"Bengaluru South"}
+]

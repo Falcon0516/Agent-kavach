@@ -1,1 +1,6 @@
-[]
+[
+  {"node_id":"ARGUS-01","name":"Main Entrance","lat":13.0827,"lon":77.5877,
+   "stream_url":"http://FILL_ANDROID1_TAILSCALE_IP:8080/video","status":"active"},
+  {"node_id":"ARGUS-02","name":"Demo Stage Area","lat":13.0828,"lon":77.5878,
+   "stream_url":"http://FILL_ANDROID2_TAILSCALE_IP:8080/video","status":"active"}
+]
