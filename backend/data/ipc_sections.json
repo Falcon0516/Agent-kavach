@@ -1,1 +1,12 @@
-{}
+{
+  "354":  {"title": "Assault/criminal force on woman with intent", "punishment": "1–5 years"},
+  "354A": {"title": "Sexual harassment", "punishment": "1–3 years"},
+  "354B": {"title": "Assault with intent to disrobe", "punishment": "3–7 years"},
+  "354D": {"title": "Stalking", "punishment": "1–3 years (repeat: 3–5 years)"},
+  "509":  {"title": "Word/gesture to insult modesty", "punishment": "1 year"},
+  "323":  {"title": "Voluntarily causing hurt", "punishment": "1 year"},
+  "506":  {"title": "Criminal intimidation", "punishment": "2–7 years"},
+  "376":  {"title": "Rape", "punishment": "7 years to life"},
+  "498A": {"title": "Cruelty by husband/relatives", "punishment": "3 years"},
+  "34":   {"title": "Acts done by several persons in furtherance of common intention", "punishment": "As per main offence"}
+}

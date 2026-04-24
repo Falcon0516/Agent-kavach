@@ -1,1 +1,22 @@
-[]
+[
+  {"id":"ARGUS-01","name":"Main Entrance","lat":13.0827,"lon":77.5877,
+   "type":"mobile","status":"active","stream_url":"http://FILL_ANDROID1_TAILSCALE_IP:8080/video",
+   "capabilities":["face","plate","object"],"coverage_radius_m":50,
+   "description":"Android #1 IP Webcam feed"},
+  {"id":"ARGUS-02","name":"Demo Stage Area","lat":13.0828,"lon":77.5878,
+   "type":"mobile","status":"active","stream_url":"http://FILL_ANDROID2_TAILSCALE_IP:8080/video",
+   "capabilities":["face","plate","object"],"coverage_radius_m":40,
+   "description":"Android #2 IP Webcam feed"},
+  {"id":"ARGUS-03","name":"Yelahanka Junction Camera","lat":13.1010,"lon":77.5960,
+   "type":"fixed","status":"active","capabilities":["face","object"],
+   "coverage_radius_m":60,"description":"Traffic junction wide-angle"},
+  {"id":"ARGUS-04","name":"Hebbal Flyover Camera","lat":13.0360,"lon":77.5972,
+   "type":"fixed","status":"active","capabilities":["plate","object"],
+   "coverage_radius_m":80,"description":"Flyover entry/exit ANPR camera"},
+  {"id":"ARGUS-05","name":"Indiranagar 100ft Road Camera","lat":12.9786,"lon":77.6410,
+   "type":"fixed","status":"standby","capabilities":["face","object"],
+   "coverage_radius_m":45,"description":"Commercial strip night surveillance"},
+  {"id":"ARGUS-06","name":"Koramangala Signal Camera","lat":12.9355,"lon":77.6248,
+   "type":"fixed","status":"active","capabilities":["face","plate","object"],
+   "coverage_radius_m":55,"description":"Major junction multi-angle"}
+]

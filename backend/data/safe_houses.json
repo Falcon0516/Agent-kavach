@@ -1,1 +1,17 @@
-[]
+[
+  {"id":"SH-001","name":"Nirbhaya Safe House Rajajinagar","lat":12.9917,"lon":77.5521,
+   "phone":"+918029222001","address":"Rajajinagar 2nd Block, Bengaluru 560010",
+   "capacity":20,"type":"government"},
+  {"id":"SH-002","name":"Women's Shelter Jayanagar","lat":12.9250,"lon":77.5840,
+   "phone":"+918029222002","address":"Jayanagar 4th Block, Bengaluru 560041",
+   "capacity":15,"type":"ngo"},
+  {"id":"SH-003","name":"Karnataka State Women's Commission Shelter","lat":12.9770,"lon":77.5900,
+   "phone":"+918029222003","address":"Sheshadripuram, Bengaluru 560020",
+   "capacity":25,"type":"government"},
+  {"id":"SH-004","name":"Parihar Women's Home","lat":12.9400,"lon":77.6100,
+   "phone":"+918029222004","address":"Koramangala 6th Block, Bengaluru 560095",
+   "capacity":18,"type":"ngo"},
+  {"id":"SH-005","name":"Vimochana Safe Space","lat":13.0100,"lon":77.5700,
+   "phone":"+918029222005","address":"Malleshwaram, Bengaluru 560003",
+   "capacity":12,"type":"ngo"}
+]
