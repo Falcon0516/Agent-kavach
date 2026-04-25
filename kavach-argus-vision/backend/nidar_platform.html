@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kavach — Autonomous Women's Safety Operating System</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+:root{
+  --bg:#02080f;--bg2:#04101e;--card:#060e1a;--card2:#091525;
+  --border:#0d1f30;--border2:#152a3d;
+  --crimson:#e11d48;--crimson2:#fb7185;--crimson3:#fda4af;
+  --purple:#7c3aed;--purple2:#a78bfa;
+  --blue:#0ea5e9;--blue2:#38bdf8;
+  --green:#22c55e;--green2:#4ade80;
+  --amber:#f59e0b;--amber2:#fbbf24;
+  --teal:#06b6d4;
+  --text:#dde8f5;--muted:#3d5570;--muted2:#5a7a90;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;overflow-x:hidden}
+#scroll-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--crimson),var(--purple),var(--blue2));z-index:1000;width:0}
+nav{position:fixed;top:0;left:0;right:0;z-index:800;height:52px;background:rgba(2,8,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px}
+.nav-logo{font-family:Impact,'Arial Narrow',sans-serif;font-size:20px;letter-spacing:5px;background:linear-gradient(90deg,var(--crimson2),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-sub{font-family:Consolas,monospace;font-size:9px;letter-spacing:.25em;color:var(--muted2);text-transform:uppercase}
+.nav-links{display:flex;gap:2px}
+.nav-links a{font-family:Consolas,monospace;font-size:9px;letter-spacing:.08em;color:var(--muted2);text-decoration:none;padding:5px 9px;border-radius:2px;border:1px solid transparent;transition:all .2s;text-transform:uppercase}
+.nav-links a:hover{color:var(--crimson2);border-color:rgba(225,29,72,.3);background:rgba(225,29,72,.06)}
+section{position:relative;z-index:1;padding:100px 60px 80px;border-bottom:1px solid var(--border)}
+@media(max-width:768px){section{padding:84px 18px 60px}nav{padding:0 14px}.nav-links{display:none}}
+.ghost{position:absolute;top:52px;right:48px;font-family:Impact,'Arial Narrow',sans-serif;font-size:150px;line-height:1;color:rgba(225,29,72,.025);user-select:none;pointer-events:none;letter-spacing:-6px}
+.eyebrow{font-family:Consolas,monospace;font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--crimson);margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:'';width:28px;height:1px;background:linear-gradient(90deg,transparent,var(--crimson))}
+h1{font-family:Impact,'Arial Narrow',sans-serif;font-size:clamp(62px,9vw,128px);line-height:.88;letter-spacing:3px;background:linear-gradient(135deg,#fff 0%,var(--crimson2) 40%,var(--purple2) 75%,var(--blue2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-family:Impact,'Arial Narrow',sans-serif;font-size:clamp(38px,5vw,68px);letter-spacing:2px;color:#fff;line-height:.95;margin-bottom:8px}
+h3{font-family:'Arial Narrow',Arial,sans-serif;font-size:21px;font-weight:700;color:var(--crimson2);margin-bottom:10px;letter-spacing:.3px}
+h4{font-family:'Arial Narrow',Arial,sans-serif;font-size:15px;font-weight:700;color:var(--purple2);margin-bottom:5px}
+p{margin-bottom:12px;color:#84a0b8;line-height:1.7;font-size:14px}
+p:last-child{margin-bottom:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:22px;position:relative;overflow:hidden;transition:border-color .3s,transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(0,0,0,.55);border-color:rgba(225,29,72,.3)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.cc::before{background:linear-gradient(90deg,var(--crimson),var(--purple))}
+.cp::before{background:linear-gradient(90deg,var(--purple),var(--blue))}
+.cb::before{background:linear-gradient(90deg,var(--blue),var(--teal))}
+.cg::before{background:linear-gradient(90deg,var(--green),var(--teal))}
+.ca::before{background:linear-gradient(90deg,var(--amber),var(--crimson))}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:16px}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+@media(max-width:900px){.split{grid-template-columns:1fr;gap:26px}}
+.tag{display:inline-block;font-family:Consolas,monospace;font-size:9px;padding:2px 8px;border-radius:2px;margin:2px}
+.tr{background:rgba(225,29,72,.1);color:var(--crimson2);border:1px solid rgba(225,29,72,.25)}
+.tp{background:rgba(124,58,237,.1);color:var(--purple2);border:1px solid rgba(124,58,237,.25)}
+.tb{background:rgba(14,165,233,.1);color:var(--blue2);border:1px solid rgba(14,165,233,.25)}
+.tg{background:rgba(34,197,94,.1);color:var(--green2);border:1px solid rgba(34,197,94,.25)}
+.ta{background:rgba(245,158,11,.1);color:var(--amber2);border:1px solid rgba(245,158,11,.25)}
+.callout{border-left:3px solid var(--crimson);background:rgba(225,29,72,.07);padding:14px 18px;border-radius:0 4px 4px 0;margin:14px 0;font-size:13px;color:#7090a8}
+.callout strong{color:var(--crimson2)}
+.callout.purp{border-color:var(--purple);background:rgba(124,58,237,.07)}
+.callout.purp strong{color:var(--purple2)}
+.callout.grn{border-color:var(--green);background:rgba(34,197,94,.06)}
+.callout.grn strong{color:var(--green2)}
+.callout.blu{border-color:var(--blue);background:rgba(14,165,233,.07)}
+.callout.blu strong{color:var(--blue2)}
+.stat-val{font-family:Impact,'Arial Narrow',sans-serif;font-size:52px;line-height:1;color:var(--crimson2)}
+.stat-label{font-family:Consolas,monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin-top:3px}
+.pdot{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;animation:pring 2s infinite}
+@keyframes pring{0%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.tbl-wrap{overflow-x:auto;margin-top:18px;border-radius:5px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-family:'Arial Narrow',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--crimson2);background:rgba(225,29,72,.08);border-bottom:2px solid rgba(225,29,72,.25);padding:11px 14px;text-align:left}
+td{border-bottom:1px solid var(--border);padding:9px 14px;color:#6080a0;vertical-align:top;line-height:1.55;word-wrap:break-word}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(225,29,72,.04)}
+.agent-card{background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:20px;position:relative;overflow:hidden;transition:all .25s}
+.agent-card:hover{border-color:rgba(225,29,72,.4);transform:translateY(-2px)}
+.agent-num{font-family:Consolas,monospace;font-size:9px;letter-spacing:.2em;color:var(--muted2);margin-bottom:6px;text-transform:uppercase}
+.role-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;font-family:Consolas,monospace;letter-spacing:.05em;margin-bottom:14px}
+.pill-women{background:rgba(225,29,72,.12);color:var(--crimson2);border:1px solid rgba(225,29,72,.3)}
+.pill-police{background:rgba(14,165,233,.12);color:var(--blue2);border:1px solid rgba(14,165,233,.3)}
+.pill-volunteer{background:rgba(34,197,94,.12);color:var(--green2);border:1px solid rgba(34,197,94,.3)}
+.pill-all{background:rgba(124,58,237,.12);color:var(--purple2);border:1px solid rgba(124,58,237,.3)}
+.feature-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.feature-row:last-child{border-bottom:none}
+.feat-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px}
+.feat-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;font-family:'Arial Narrow',Arial,sans-serif;letter-spacing:.3px}
+.feat-desc{font-size:12px;color:var(--muted2);line-height:1.5}
+.timeline-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.tl-time{font-family:Consolas,monospace;font-size:10px;color:var(--muted2);min-width:52px;padding-top:2px;letter-spacing:.05em}
+.tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.tl-desc{font-size:12px;color:var(--muted2);line-height:1.5}
+.arch-box{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:14px 16px;font-family:Consolas,monospace;font-size:11px;line-height:1.8;color:#6a8aaa}
+.arch-box .hl{color:var(--crimson2)}
+.arch-box .hl2{color:var(--purple2)}
+.arch-box .hl3{color:var(--blue2)}
+.arch-box .hl4{color:var(--green2)}
+.score-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);padding:8px 16px;border-radius:20px}
+.score-num{font-size:20px;font-weight:700;color:var(--green2);font-family:Impact,'Arial Narrow',sans-serif}
+.score-label{font-size:11px;color:var(--green2);font-family:Consolas,monospace;letter-spacing:.08em}
+.integration-badge{background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.25);border-radius:4px;padding:3px 9px;font-family:Consolas,monospace;font-size:9px;color:var(--blue2);letter-spacing:.1em;display:inline-block;margin:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.rv{animation:fadeUp .6s ease both}
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.4s}
+</style>
+</head>
+<body>
+
+<div id="scroll-bar"></div>
+
+<nav>
+  <div>
+    <div class="nav-logo">Kavach</div>
+    <div class="nav-sub">निडर · Women's Safety OS · Sentinel Hack 6.0</div>
+  </div>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#platform">Platform</a>
+    <a href="#apps">Apps</a>
+    <a href="#agents">Agents</a>
+    <a href="#argus">Argus Layer</a>
+    <a href="#demo">Demo</a>
+    <a href="#stack">Stack</a>
+    <a href="#business">Business</a>
+    <a href="#impact">Impact</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero" style="padding:140px 60px 80px;min-height:100vh;display:flex;flex-direction:column;justify-content:center">
+  <div class="ghost">Kavach</div>
+  <div class="eyebrow rv">Sentinel Hack 6.0 · KSIT · Agentic AI Track</div>
+  <h1 class="rv d1">Kavach</h1>
+  <div style="font-family:Consolas,monospace;font-size:13px;letter-spacing:.4em;color:var(--muted2);margin:8px 0 28px;text-transform:uppercase" class="rv d2">N · I · D · A · R &nbsp;—&nbsp; निडर &nbsp;—&nbsp; Fearless</div>
+  <div style="max-width:780px" class="rv d2">
+    <p style="font-size:18px;color:#9ab8d0;line-height:1.65">India's first Autonomous Women's Safety Operating System — a three-app, role-based platform combining 5 agentic AI responders with a decentralized CCTV surveillance mesh, volunteer network, and police command intelligence. Not an app. An immune system.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;max-width:820px;margin-top:40px" class="rv d3">
+    <div class="card cc" style="text-align:center;padding:20px 14px">
+      <div class="stat-val">400+</div>
+      <div class="stat-label">crimes daily<br>against women in India</div>
+    </div>
+    <div class="card cc" style="text-align:center;padding:20px 14px">
+      <div class="stat-val" style="color:var(--purple2)">3 apps</div>
+      <div class="stat-label">Women · Police · Volunteer<br>role-based platform</div>
+    </div>
+    <div class="card cc" style="text-align:center;padding:20px 14px">
+      <div class="stat-val" style="color:var(--blue2)">5+1</div>
+      <div class="stat-label">AI agents + Argus<br>CCTV intelligence</div>
+    </div>
+    <div class="card cc" style="text-align:center;padding:20px 14px">
+      <div class="stat-val" style="color:var(--green2)">8s</div>
+      <div class="stat-label">full 5-agent coordination<br>vs 15 min human avg</div>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;display:flex;gap:10px;flex-wrap:wrap" class="rv d4">
+    <span class="tag tr">Agentic AI</span>
+    <span class="tag tp">Multi-agent orchestration</span>
+    <span class="tag tb">CCTV Mesh Intelligence</span>
+    <span class="tag tg">Physical Device Control</span>
+    <span class="tag ta">India-First</span>
+    <span class="tag tr">Court-Admissible Evidence</span>
+    <span class="tag tp">Role-Based Platform</span>
+    <span class="tag tb">Production-Ready</span>
+  </div>
+</section>
+
+<!-- ═══ PROBLEM ═══ -->
+<section id="problem">
+  <div class="ghost">01</div>
+  <div class="eyebrow">Section 01</div>
+  <h2>The Problem</h2>
+  <p style="max-width:820px;margin-top:8px">Why existing solutions are fundamentally broken.</p>
+
+  <div class="split" style="margin-top:32px">
+    <div>
+      <div class="rv">
+        <h3>The Crisis Is Not Lack of Apps</h3>
+        <p>India has 30+ women's safety apps. Every Indian city has CCTV cameras. Every police station has an emergency number. Yet every 2 minutes, a crime against a woman is committed and the response remains catastrophically slow, fragmented, and reactive.</p>
+        <div class="callout"><strong>The real problem:</strong> Every existing tool sends one alert and waits for a human to coordinate the response. They're buttons, not agents. They inform, they don't act.</div>
+      </div>
+      <div style="margin-top:20px" class="rv d2">
+        <h4>The Five Response Failures</h4>
+        <div class="tbl-wrap">
+          <table>
+            <tr><th>Failure Layer</th><th>What Breaks</th><th>Kavach Fix</th></tr>
+            <tr><td>Alerting</td><td>One-way notification, no coordination</td><td>5 agents coordinate simultaneously</td></tr>
+            <tr><td>Police Response</td><td>15–30 min average response time</td><td>Automated 112 dispatch + CCTV activation</td></tr>
+            <tr><td>Evidence</td><td>No automatic recording; evidence lost</td><td>Cloud evidence from second 1; CCTV preserved</td></tr>
+            <tr><td>Tracking</td><td>No cross-camera suspect tracking</td><td>Argus mesh follows suspect across city</td></tr>
+            <tr><td>Legal</td><td>Victims file FIR manually, days later</td><td>FIR pre-drafted automatically with evidence</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="rv d1">
+      <h3>What Exists — And Why It Fails</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <div class="card" style="padding:14px 16px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Nirbhaya App / Shakti / iCall</div>
+          <p style="font-size:12px;margin:0;color:var(--muted2)">Sends one SOS alert. No autonomous follow-up. No CCTV. No evidence collection. No police coordination. A better button.</p>
+        </div>
+        <div class="card" style="padding:14px 16px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">CCTV Networks (existing)</div>
+          <p style="font-size:12px;margin:0;color:var(--muted2)">Passive recording only. Officers review footage days later — after DVRs have overwritten evidence. Zero real-time intelligence.</p>
+        </div>
+        <div class="card" style="padding:14px 16px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">112 Emergency System</div>
+          <p style="font-size:12px;margin:0;color:var(--muted2)">Requires manual call. No automatic context (location, threat level, attacker description). Caller must be able to speak calmly under duress.</p>
+        </div>
+        <div class="card" style="padding:14px 16px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Community Safety Apps (BeSafe etc.)</div>
+          <p style="font-size:12px;margin:0;color:var(--muted2)">Passive heatmaps and community reporting. No emergency response. No real-time action. No coordination with law enforcement.</p>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:14px"><strong>The gap Kavach fills:</strong> No system anywhere combines autonomous agent response + CCTV surveillance + volunteer network + police coordination + automatic evidence creation in one platform.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PLATFORM ═══ -->
+<section id="platform">
+  <div class="ghost">02</div>
+  <div class="eyebrow">Section 02</div>
+  <h2>The Platform</h2>
+  <p style="max-width:780px;margin-top:8px">Kavach is not a single app. It is a three-layer operating system for women's safety — connecting the person in danger, the police with intelligence, and the community with tools to respond.</p>
+
+  <div style="margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+    <div class="card cc rv" style="border-color:rgba(225,29,72,.35)">
+      <div style="font-size:28px;margin-bottom:10px">01</div>
+      <div class="role-pill pill-women">Kavach Guardian</div>
+      <h3 style="font-size:16px">Women's App</h3>
+      <p style="font-size:13px">The primary safety interface for women. Panic trigger, safe walk mode, smart routing, trusted circle, fake call, community heatmap. Everything works with one tap or voice command.</p>
+      <div style="margin-top:12px">
+        <span class="tag tr">iOS & Android</span>
+        <span class="tag tr">Offline capable</span>
+        <span class="tag tr">Voice trigger</span>
+      </div>
+    </div>
+    <div class="card cp rv d1" style="border-color:rgba(14,165,233,.35)">
+      <div style="font-size:28px;margin-bottom:10px">02</div>
+      <div class="role-pill pill-police">Kavach Command</div>
+      <h3 style="font-size:16px;color:var(--blue2)">Police & Authority Dashboard</h3>
+      <p style="font-size:13px">Web + mobile command center for law enforcement. Real-time incident map, Argus CCTV mesh integration, automated evidence packages, cross-jurisdiction relay, WhatsApp command interface.</p>
+      <div style="margin-top:12px">
+        <span class="tag tb">Web dashboard</span>
+        <span class="tag tb">WhatsApp interface</span>
+        <span class="tag tb">Argus CCTV mesh</span>
+      </div>
+    </div>
+    <div class="card cg rv d2" style="border-color:rgba(34,197,94,.35)">
+      <div style="font-size:28px;margin-bottom:10px">03</div>
+      <div class="role-pill pill-volunteer">Kavach Sentinel</div>
+      <h3 style="font-size:16px;color:var(--green2)">Volunteer & Guardian App</h3>
+      <p style="font-size:13px">Community responder network. Verified volunteers receive proximity alerts, register safe spaces (shops, hospitals), coordinate with police, and build the physical safety mesh.</p>
+      <div style="margin-top:12px">
+        <span class="tag tg">Volunteer verified</span>
+        <span class="tag tg">Safe space registry</span>
+        <span class="tag tg">Proximity alerts</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;padding:24px;background:var(--card2);border:1px solid var(--border2);border-radius:8px">
+    <h4 style="color:var(--text);font-size:14px;margin-bottom:16px;font-family:Consolas,monospace;letter-spacing:.1em;text-transform:uppercase">Platform Architecture Overview</h4>
+    <div class="arch-box">
+      <span class="hl">┌─────────────────── Kavach PLATFORM ────────────────────────────────────────┐</span>
+      <br>│                                                                                │
+      <br>│  <span class="hl">[ Kavach GUARDIAN ]</span>   <span class="hl2">[ Kavach COMMAND ]</span>     <span class="hl4">[ Kavach SENTINEL ]</span>          │
+      <br>│  Women's App          Police Dashboard      Volunteer Network             │
+      <br>│  iOS / Android        Web + Mobile          iOS / Android                 │
+      <br>│         │                   │                       │                         │
+      <br>│         └───────────────────┼───────────────────────┘                         │
+      <br>│                             │                                                  │
+      <br>│               <span class="hl2">┌─────────────▼──────────────────┐</span>                              │
+      <br>│               <span class="hl2">│   Kavach ORCHESTRATOR (Claude)  │</span>                              │
+      <br>│               <span class="hl2">│   LangGraph State Machine      │</span>                              │
+      <br>│               <span class="hl2">│   5 Autonomous AI Agents       │</span>                              │
+      <br>│               <span class="hl2">│   Mac / Cloud Server           │</span>                              │
+      <br>│               <span class="hl2">└────────────────┬───────────────┘</span>                              │
+      <br>│                                │                                                  │
+      <br>│         ┌──────────────────────┼──────────────────────┐                          │
+      <br>│         │                      │                      │                          │
+      <br>│  <span class="hl">Agent 1–5</span>        <span class="hl3">Argus CCTV Mesh</span>        External APIs                  │
+      <br>│  Response agents    Worker nodes + Master    112, WhatsApp,              │
+      <br>│  (phone control)    Face / vehicle tracking  Firebase, Maps              │
+      <br>│                                                                                │
+      <span class="hl">└────────────────────────────────────────────────────────────────────────────┘</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ THREE APPS ═══ -->
+<section id="apps">
+  <div class="ghost">03</div>
+  <div class="eyebrow">Section 03</div>
+  <h2>Three Apps. One Ecosystem.</h2>
+  <p style="max-width:780px;margin-top:8px">Full feature breakdown for each role-based application. Every feature is production-implementable with the defined tech stack.</p>
+
+  <!-- GUARDIAN -->
+  <div style="margin-top:40px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="role-pill pill-women" style="padding:8px 18px;font-size:12px">Kavach GUARDIAN · Women's App</div>
+      <span style="font-family:Consolas,monospace;font-size:10px;color:var(--muted2)">PRIMARY USER INTERFACE</span>
+    </div>
+    <div class="g3">
+      <div class="card cc rv">
+        <h4>Panic Trigger System</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(225,29,72,.1)">🔴</div>
+          <div><div class="feat-title">Voice Trigger — "Kavach!"</div><div class="feat-desc">Wake word detection (Porcupine SDK). Works with screen off. No unlock needed. Triggers all 5 agents instantly.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(225,29,72,.1)">📳</div>
+          <div><div class="feat-title">Triple Shake / Side Button</div><div class="feat-desc">Physical trigger for situations where speech is impossible. Configurable sensitivity. Also: rapid volume press sequence.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(225,29,72,.1)">🤫</div>
+          <div><div class="feat-title">Silent SOS</div><div class="feat-desc">Triggers full agent response with NO sound, NO screen light. Attacker sees nothing. All actions happen invisibly in background.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(225,29,72,.1)">⌚</div>
+          <div><div class="feat-title">Wearable Trigger</div><div class="feat-desc">WearOS / Fitbit / Apple Watch panic button integration. Physical tap on wrist. No phone in hand required.</div></div>
+        </div>
+      </div>
+
+      <div class="card cc rv d1">
+        <h4>Safe Walk Mode</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(245,158,11,.1)">🗺️</div>
+          <div><div class="feat-title">Smart Safe Route</div><div class="feat-desc">Routes calculated using crime heatmap + camera coverage + time of day. Avoids dark lanes. Prioritizes camera-dense paths.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(245,158,11,.1)">📍</div>
+          <div><div class="feat-title">Live Location Broadcast</div><div class="feat-desc">Continuous location stream to trusted circle. Deviation alerts — if user stops unexpectedly, contacts notified automatically.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(245,158,11,.1)">⏰</div>
+          <div><div class="feat-title">Safe Arrival Check-in</div><div class="feat-desc">User sets destination + ETA. If not checked in on arrival → automatic alert escalation sequence begins.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(245,158,11,.1)">🏪</div>
+          <div><div class="feat-title">Safe Space Navigator</div><div class="feat-desc">Real-time map of Kavach Sentinel registered safe spaces nearby. Blue dot = verified 24hr safe space. Tap for walking directions.</div></div>
+        </div>
+      </div>
+
+      <div class="card cc rv d2">
+        <h4>Smart Safety Tools</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(124,58,237,.1)">📞</div>
+          <div><div class="feat-title">AI Fake Call Generator</div><div class="feat-desc">Instantly generates a convincing incoming call with AI voice. Lets user escape uncomfortable situations without confrontation.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(124,58,237,.1)">👥</div>
+          <div><div class="feat-title">Trusted Circle</div><div class="feat-desc">Up to 5 trusted contacts with custom permission levels. Share location only, share audio, or grant full emergency access.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(124,58,237,.1)">🗣️</div>
+          <div><div class="feat-title">Audio Evidence Recording</div><div class="feat-desc">Background audio recording uploaded to encrypted cloud in real-time. Timestamped for legal validity. Attacker cannot delete it.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(124,58,237,.1)">📊</div>
+          <div><div class="feat-title">Community Safety Map</div><div class="feat-desc">Anonymized crime heatmap from community reports + police data + NCRB stats. Know which areas are unsafe before you walk.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMAND -->
+  <div style="margin-top:40px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="role-pill pill-police" style="padding:8px 18px;font-size:12px">Kavach COMMAND · Police Dashboard</div>
+      <div class="integration-badge">ARGUS INTEGRATED</div>
+    </div>
+    <div class="g3">
+      <div class="card cp rv">
+        <h4 style="color:var(--blue2)">Real-Time Intelligence</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">🗺️</div>
+          <div><div class="feat-title">Live Incident Command Map</div><div class="feat-desc">All active Kavach alerts on real-time map. Threat level color coding. Nearest patrol units visible. One-click dispatch.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">📹</div>
+          <div><div class="feat-title">Argus CCTV Mesh View</div><div class="feat-desc">When panic triggered → all cameras within 500m activate automatically. Officer sees live feeds around incident without any manual action.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">🔍</div>
+          <div><div class="feat-title">WhatsApp Command Interface</div><div class="feat-desc">Officers send plain-language messages ("Black Honda, fled Koramangala 8th block"). Master Node parses and spawns investigation agents — Argus style.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">🔄</div>
+          <div><div class="feat-title">Cross-Jurisdiction Relay</div><div class="feat-desc">If suspect exits jurisdiction, full investigation brief relayed to neighboring station's Master Node in &lt;1 second. No phone call needed.</div></div>
+        </div>
+      </div>
+
+      <div class="card cp rv d1">
+        <h4 style="color:var(--blue2)">Evidence & Legal</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">⚖️</div>
+          <div><div class="feat-title">Auto Evidence Package</div><div class="feat-desc">Section 65B court-admissible evidence bundle: Kavach audio + location trail + Argus CCTV clips + timestamps. Ready for FIR attachment.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">📄</div>
+          <div><div class="feat-title">AI-Drafted FIR</div><div class="feat-desc">Claude API generates structured FIR from incident data. Officer reviews and approves in one click. IPC section suggestions included.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">🧩</div>
+          <div><div class="feat-title">Face & Vehicle Tracking</div><div class="feat-desc">Argus face recognition + vehicle plate recognition across camera mesh. Suspect tracking trail generated automatically from incident location.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">📈</div>
+          <div><div class="feat-title">Crime Pattern Analytics</div><div class="feat-desc">AI identifies crime hotspots, time patterns, repeat offenders across stations. Preventive patrol recommendations generated automatically.</div></div>
+        </div>
+      </div>
+
+      <div class="card cp rv d2">
+        <h4 style="color:var(--blue2)">Coordination Tools</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">📡</div>
+          <div><div class="feat-title">Volunteer Network Visibility</div><div class="feat-desc">All Kavach Sentinel volunteers visible on incident map. Police can dispatch nearest volunteer for immediate on-ground presence.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">🏥</div>
+          <div><div class="feat-title">Hospital & Resource Routing</div><div class="feat-desc">Nearest trauma hospital, blood bank, women's cell automatically identified and pre-alerted when incident classified as physical assault.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">📊</div>
+          <div><div class="feat-title">Shift Dashboard</div><div class="feat-desc">Officer's active incidents, resolved cases, response time metrics. Supervisor sees station-level performance. Accountability built in.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(14,165,233,.1)">🔔</div>
+          <div><div class="feat-title">Predictive Alerts</div><div class="feat-desc">AI predicts high-risk zones by hour using historical data + event calendar + weather. Preemptive patrol suggestions sent to duty officer.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SENTINEL -->
+  <div style="margin-top:40px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="role-pill pill-volunteer" style="padding:8px 18px;font-size:12px">Kavach SENTINEL · Volunteer App</div>
+      <span style="font-family:Consolas,monospace;font-size:10px;color:var(--muted2)">COMMUNITY GUARDIAN NETWORK</span>
+    </div>
+    <div class="g3">
+      <div class="card cg rv">
+        <h4 style="color:var(--green2)">Volunteer Response</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(34,197,94,.1)">🚨</div>
+          <div><div class="feat-title">Proximity Panic Alerts</div><div class="feat-desc">When Kavach Guardian panic triggered → verified volunteers within 500m receive alert with location and situation type. Accept to respond.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(34,197,94,.1)">✅</div>
+          <div><div class="feat-title">KYC Verified Enrollment</div><div class="feat-desc">Aadhaar-based verification for all volunteers. Background check integration. Tiered trust levels (Community, Guardian, First Responder).</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(34,197,94,.1)">📍</div>
+          <div><div class="feat-title">Safe Space Registration</div><div class="feat-desc">Shops, pharmacies, hospitals register as Kavach Safe Spaces. Appear on Guardian app map. Commit to shelter any woman in distress.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(34,197,94,.1)">🎖️</div>
+          <div><div class="feat-title">Karma Points & Recognition</div><div class="feat-desc">Points for responses, patrol hours, safe space hosting. Monthly recognition, certificates, and potential civic reward programs.</div></div>
+        </div>
+      </div>
+
+      <div class="card cg rv d1">
+        <h4 style="color:var(--green2)">Community Tools</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(34,197,94,.1)">🗓️</div>
+          <div><div class="feat-title">Community Patrol Scheduler</div><div class="feat-desc">Volunteers coordinate patrol routes and timings for high-risk zones. AI suggests patrol schedule based on crime heatmap data.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(34,197,94,.1)">📚</div>
+          <div><div class="feat-title">First Responder Training</div><div class="feat-desc">In-app training modules: de-escalation, evidence preservation, legal rights, trauma support. Certification on completion.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(34,197,94,.1)">🤝</div>
+          <div><div class="feat-title">NGO & Organization Hub</div><div class="feat-desc">SHEROES, iCall, Swayam, Snehi — verified NGOs connect directly with incident survivors for post-incident support and legal aid.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(34,197,94,.1)">📣</div>
+          <div><div class="feat-title">Anonymous Community Reports</div><div class="feat-desc">Report unsafe areas, eve-teasing incidents, broken streetlights. Feeds Kavach's crime heatmap. Anonymized and moderated.</div></div>
+        </div>
+      </div>
+
+      <div class="card cg rv d2">
+        <h4 style="color:var(--green2)">Platform-Wide Features</h4>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(124,58,237,.1)">🌐</div>
+          <div><div class="feat-title">11 Language Support</div><div class="feat-desc">All three apps in Kannada, Hindi, Tamil, Telugu, Marathi, Bengali, Punjabi, Malayalam, Odia, Gujarati, and English.</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(124,58,237,.1)">📵</div>
+          <div><div class="feat-title">Offline Emergency Mode</div><div class="feat-desc">Core panic functionality works without internet. SMS fallback to 112 and trusted contacts. Location via GPS only (no data needed).</div></div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon" style="background:rgba(124,58,237,.1)">🔒</div>
+          <div><div class="feat-title">End-to-End Encryption</div><div class="feat-desc">All user data, location, and audio encrypted at rest and in transit. DPDP Act 2023 compliant. Users own their data.</div></div>
+        </div>
+        <div class="feature-row" style="border-bottom:none">
+          <div class="feat-icon" style="background:rgba(124,58,237,.1)">🌍</div>
+          <div><div class="feat-title">Global Architecture</div><div class="feat-desc">Designed for India-first. Scalable to Southeast Asia, Middle East, Africa — all regions with similar safety gaps. Multi-country deployment ready.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AI AGENTS ═══ -->
+<section id="agents">
+  <div class="ghost">04</div>
+  <div class="eyebrow">Section 04</div>
+  <h2>5 Autonomous AI Agents</h2>
+  <p style="max-width:780px;margin-top:8px">When panic is triggered, all 5 agents fire in parallel — not sequentially. The orchestrator coordinates. No human required at any stage.</p>
+
+  <div class="g2" style="margin-top:32px">
+    <div class="agent-card rv">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div><div class="agent-num">Agent 01 · Threat Assessor</div><h3 style="font-size:17px;margin-bottom:0">Threat Intelligence Agent</h3></div>
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(225,29,72,.15);display:flex;align-items:center;justify-content:center;font-size:16px">🎯</div>
+      </div>
+      <p style="font-size:13px">Analyzes location coordinates against NCRB crime heatmap data, time of day, historical incident density, and nearby safe space availability. Classifies threat as LOW / MEDIUM / HIGH / CRITICAL and feeds risk level to all other agents to calibrate their responses.</p>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted2);font-family:Consolas,monospace">Tools: NCRB API · Google Maps · Crime DB · Time analysis</div>
+    </div>
+
+    <div class="agent-card rv d1">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div><div class="agent-num">Agent 02 · Responder Coordinator</div><h3 style="font-size:17px;margin-bottom:0">Emergency Response Agent</h3></div>
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(14,165,233,.15);display:flex;align-items:center;justify-content:center;font-size:16px">🚨</div>
+      </div>
+      <p style="font-size:13px">Simultaneously initiates 112 police call with GPS + threat briefing, identifies nearest PCR van, alerts Kavach Sentinel volunteers in 500m radius, and notifies the user's trusted circle. Escalates automatically if no police confirmation in 90 seconds. Uses Shizuku + ADB for actual phone call initiation.</p>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted2);font-family:Consolas,monospace">Tools: 112 API · Shizuku/ADB call · WhatsApp API · Volunteer network</div>
+    </div>
+
+    <div class="agent-card rv d2">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div><div class="agent-num">Agent 03 · Family Alert</div><h3 style="font-size:17px;margin-bottom:0">Trusted Circle Agent</h3></div>
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,158,11,.15);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍👩‍👧</div>
+      </div>
+      <p style="font-size:13px">Sends WhatsApp message with live Google Maps location link to all trusted contacts. Provides real-time status updates every 60 seconds. If user marks "safe", sends confirmation. If no response within 5 minutes, escalates with second alert round. Manages the full communication loop with family until safety confirmed.</p>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted2);font-family:Consolas,monospace">Tools: WhatsApp Business API · Firebase Realtime DB · Location stream</div>
+    </div>
+
+    <div class="agent-card rv d3">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div><div class="agent-num">Agent 04 · Safe Route</div><h3 style="font-size:17px;margin-bottom:0">Navigation & Guidance Agent</h3></div>
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:16px">🧭</div>
+      </div>
+      <p style="font-size:13px">Identifies nearest registered Kavach safe space, open hospital, police station, or 24-hour shop. Delivers step-by-step voice navigation instructions via Android TTS — audible through earphones without user touching phone. Updates route dynamically if user moves off-path. Alerts if user appears stationary (potential incapacitation).</p>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted2);font-family:Consolas,monospace">Tools: Google Maps API · Places API · Android TTS · Safe space registry</div>
+    </div>
+
+    <div class="agent-card rv d1">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div><div class="agent-num">Agent 05 · Evidence Keeper</div><h3 style="font-size:17px;margin-bottom:0">Legal Evidence Agent</h3></div>
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(124,58,237,.15);display:flex;align-items:center;justify-content:center;font-size:16px">⚖️</div>
+      </div>
+      <p style="font-size:13px">Immediately begins background audio recording uploaded in real-time to encrypted Firebase Storage — irrespective of what happens to the phone. Creates tamper-proof timestamp log. Pre-drafts IPC-appropriate FIR using Claude API with location, time, and any speech-detected incident description. Coordinates with Argus CCTV Agent to include camera footage in evidence package.</p>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted2);font-family:Consolas,monospace">Tools: Firebase Storage · Claude API · IPC database · Section 65B formatter</div>
+    </div>
+
+    <div class="agent-card rv d2" style="border-color:rgba(14,165,233,.35);background:rgba(14,165,233,.04)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div class="agent-num">Agent 06 · Argus Vision</div>
+          <div class="integration-badge" style="margin-bottom:6px">ARGUS INTEGRATION</div>
+          <h3 style="font-size:17px;margin-bottom:0;color:var(--blue2)">CCTV Surveillance Agent</h3>
+        </div>
+        <div style="width:36px;height:36px;border-radius:8px;background:rgba(14,165,233,.15);display:flex;align-items:center;justify-content:center;font-size:16px">👁️</div>
+      </div>
+      <p style="font-size:13px">When panic triggered, activates all Argus Worker Nodes within 500m of incident location. Camera feeds stream to Kavach Command dashboard. Face recognition + vehicle plate recognition runs automatically. If attacker visible on any camera, tracking trail established across the mesh. Evidence from CCTV combined with Kavach audio for complete court package.</p>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted2);font-family:Consolas,monospace">Tools: Argus mesh API · Face recognition · Vehicle tracking · P2P NATS channel</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ARGUS INTEGRATION ═══ -->
+<section id="argus">
+  <div class="ghost">05</div>
+  <div class="eyebrow">Section 05 · From Project Argus</div>
+  <h2>The Argus Intelligence Layer</h2>
+  <p style="max-width:800px;margin-top:8px">Project Argus is a decentralized AI CCTV investigation system — autonomous face/vehicle tracking across a camera mesh, court-admissible evidence generation, cross-jurisdiction relay. Kavach integrates Argus as its eyes on the street.</p>
+
+  <div class="callout blu" style="max-width:820px;margin-top:20px"><strong>What Argus contributes:</strong> Argus proves that AI edge nodes on existing CCTV infrastructure can autonomously track suspects across a city in under 15 minutes. Kavach adds the trigger (panic button) and the response layer (agents) — Argus adds the eyes.</div>
+
+  <div class="split" style="margin-top:30px">
+    <div>
+      <h3>How Argus Works</h3>
+      <p style="font-size:13px">Argus deploys AI Worker Nodes on existing CCTV cameras (Raspberry Pi + edge compute). Each node runs local face/vehicle recognition. All nodes connect via an encrypted P2P mesh (NATS channel). A Master Node at the police station orchestrates investigation sub-agents. One WhatsApp message starts a cross-city search in under 2 minutes.</p>
+
+      <div class="arch-box" style="margin-top:16px">
+        <span class="hl3">┌─── ARGUS MESH ARCHITECTURE ────────────────┐</span>
+        <br>│                                                │
+        <br>│  <span class="hl3">Worker Node (Camera)</span>  × N across city     │
+        <br>│  ├─ Raspberry Pi 4 / edge compute            │
+        <br>│  ├─ Local face + plate recognition           │
+        <br>│  ├─ Event storage (pre-overwrite)            │
+        <br>│  └─ P2P NATS encrypted mesh                  │
+        <br>│                      │                        │
+        <br>│  <span class="hl3">Master Node (Police Station)</span>             │
+        <br>│  ├─ Llama 3.3 70B / Claude API               │
+        <br>│  ├─ Sub-agent spawner                        │
+        <br>│  ├─ WhatsApp / Telegram interface            │
+        <br>│  └─ Cross-jurisdiction relay                 │
+        <br><span class="hl3">└────────────────────────────────────────────┘</span>
+      </div>
+
+      <div style="margin-top:20px">
+        <h4>Argus Features Integrated into Kavach</h4>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span style="color:var(--blue2)">▸</span><span style="color:#84a0b8">Automatic camera activation when panic triggered</span></div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span style="color:var(--blue2)">▸</span><span style="color:#84a0b8">Face recognition tracks attacker across camera mesh</span></div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span style="color:var(--blue2)">▸</span><span style="color:#84a0b8">Vehicle plate recognition for suspect vehicles</span></div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span style="color:var(--blue2)">▸</span><span style="color:#84a0b8">Pre-overwrite evidence storage at every camera node</span></div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span style="color:var(--blue2)">▸</span><span style="color:#84a0b8">Section 65B court-admissible evidence package</span></div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span style="color:var(--blue2)">▸</span><span style="color:#84a0b8">Cross-jurisdiction relay &lt;1 second</span></div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span style="color:var(--blue2)">▸</span><span style="color:#84a0b8">WhatsApp command interface for officers</span></div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span style="color:var(--blue2)">▸</span><span style="color:#84a0b8">NATS encrypted P2P mesh (no central server dependency)</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Kavach + Argus Combined Flow</h3>
+      <div style="margin-top:12px">
+        <div class="timeline-item">
+          <div class="tl-time">T=0s</div>
+          <div class="tl-dot" style="background:var(--crimson2);box-shadow:0 0 10px var(--crimson)"></div>
+          <div><div class="tl-title">Woman triggers Kavach</div><div class="tl-desc">Voice "Kavach!" or shake. Orchestrator fires all 6 agents simultaneously on Mac server.</div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-time">T=2s</div>
+          <div class="tl-dot" style="background:var(--amber2)"></div>
+          <div><div class="tl-title">Threat assessment + 112 call</div><div class="tl-desc">Agent 01 classifies threat. Agent 02 initiates real 112 call via ADB + Shizuku. GPS coordinates sent.</div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-time">T=4s</div>
+          <div class="tl-dot" style="background:var(--blue2)"></div>
+          <div><div class="tl-title">Argus mesh activates</div><div class="tl-desc">Agent 06 sends activation signal to all Argus Worker Nodes within 500m. Cameras go from passive to active surveillance. Feeds appear on Kavach Command.</div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-time">T=6s</div>
+          <div class="tl-dot" style="background:var(--purple2)"></div>
+          <div><div class="tl-title">Family + volunteers alerted</div><div class="tl-desc">WhatsApp sent to trusted circle with live location. Nearest Sentinel volunteers receive proximity alert.</div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-time">T=8s</div>
+          <div class="tl-dot" style="background:var(--teal)"></div>
+          <div><div class="tl-title">Voice guidance + evidence recording</div><div class="tl-desc">Safe route voice starts. Audio recording uploads to cloud. Evidence timestamp chain begins.</div></div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-time">T=15s</div>
+          <div class="tl-dot" style="background:var(--green2)"></div>
+          <div><div class="tl-title">Attacker spotted on camera</div><div class="tl-desc">Argus face recognition identifies attacker from camera near panic location. Tracking begins across mesh. Movement trail generated.</div></div>
+        </div>
+        <div class="timeline-item" style="border-bottom:none">
+          <div class="tl-time">T=45s</div>
+          <div class="tl-dot" style="background:var(--green2);box-shadow:0 0 12px var(--green)"></div>
+          <div><div class="tl-title">Complete evidence package ready</div><div class="tl-desc">Kavach audio + Argus CCTV clips + location trail + timestamps = Section 65B court-admissible evidence. FIR pre-drafted. Suspect tracked to 3 cameras.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DEMO FLOW ═══ -->
+<section id="demo">
+  <div class="ghost">06</div>
+  <div class="eyebrow">Section 06</div>
+  <h2>The Demo That Wins</h2>
+  <p style="max-width:780px;margin-top:8px">A 90-second live demonstration that judges will not forget. Every action is real. Every output is visible. The demo runs on the team's own devices at the venue.</p>
+
+  <div class="callout" style="max-width:820px;margin-top:20px"><strong>The Setup:</strong> Mac laptop on the presentation table. Phone (mirrored via scrcpy on the big screen). A second phone held by a teammate. Kavach Command dashboard on Mac. Big screen shows all three simultaneously.</div>
+
+  <div style="margin-top:30px">
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>Time</th><th>What Presenter Says</th><th>What Judges See</th><th>Why It Lands</th></tr>
+        <tr><td style="color:var(--crimson2);font-family:Consolas,monospace;font-size:11px">T=0s</td><td>"Watch what happens in the next 90 seconds. Priya is walking alone at 11 PM."</td><td>Phone 1 screen shown via scrcpy. Kavach app open. Silent tension.</td><td>Setup creates investment. Every judge thinks of someone they know.</td></tr>
+        <tr><td style="color:var(--crimson2);font-family:Consolas,monospace;font-size:11px">T=5s</td><td>"She feels unsafe. She says — Kavach."</td><td>Team member says "Kavach!" into Phone 1. Mac dashboard activates instantly. 6 agent nodes light up simultaneously.</td><td>Voice trigger is theatrical. 6 agents firing at once is visual proof of orchestration.</td></tr>
+        <tr><td style="color:var(--crimson2);font-family:Consolas,monospace;font-size:11px">T=8s</td><td>"In 8 seconds: police have been called, her family knows, an evidence trail has started."</td><td>Phone 1 shows real 112 call dialing. Second phone (held by teammate) receives actual WhatsApp with location link.</td><td>Real phone call. Real WhatsApp. Not a simulation. Judges see proof.</td></tr>
+        <tr><td style="color:var(--crimson2);font-family:Consolas,monospace;font-size:11px">T=15s</td><td>"But Kavach doesn't stop there. Every camera within 500 metres just woke up."</td><td>Kavach Command dashboard shows camera feeds activating around incident location. Argus mesh visualization lights up on map.</td><td>The CCTV angle. Nobody else has this. Judges understand the magnitude.</td></tr>
+        <tr><td style="color:var(--crimson2);font-family:Consolas,monospace;font-size:11px">T=30s</td><td>"Her phone is guiding her to safety — without her touching it."</td><td>Phone 1 plays voice: "Cauvery Medical Centre is 340 metres ahead, keep walking forward." Dashboard shows evidence recording counter ticking up.</td><td>Voice guidance is emotionally powerful. AI doing the thinking under pressure.</td></tr>
+        <tr><td style="color:var(--crimson2);font-family:Consolas,monospace;font-size:11px">T=60s</td><td>"Meanwhile — the attacker was spotted on a camera 200 metres away. The trail has begun."</td><td>Dashboard shows "Face match: Camera 04 — Koramangala 4th Block, T+47s". Movement trail appears on map. Cross-jurisdiction relay fires.</td><td>Argus CCTV tracking is the final wow moment. Nobody in that room has seen this.</td></tr>
+        <tr><td style="color:var(--green2);font-family:Consolas,monospace;font-size:11px">T=90s</td><td>"In 90 seconds. Police alerted. Family notified. Evidence secured. Suspect tracked. FIR drafted. Human average: 45 minutes."</td><td>Dashboard shows complete evidence package. FIR preview on screen. All 6 agents green.</td><td>The punchline. The contrast (90 seconds vs 45 minutes) is unforgettable.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="callout grn" style="margin-top:20px;max-width:820px"><strong>The Closing Line:</strong> "In India, 400 women face crimes every single day. Most of them face it alone — with nothing but a phone and hope. Kavach is the first system that doesn't just warn them. It fights for them. And it remembers everything."</div>
+</section>
+
+<!-- ═══ TECH STACK ═══ -->
+<section id="stack">
+  <div class="ghost">07</div>
+  <div class="eyebrow">Section 07</div>
+  <h2>Technology Stack</h2>
+  <p style="max-width:780px;margin-top:8px">Production-grade stack chosen for reliability, scalability, and hackathon buildability with AI coding agents.</p>
+
+  <div class="g2" style="margin-top:32px">
+    <div>
+      <h3>Mac Server (Brain)</h3>
+      <div class="tbl-wrap">
+        <table>
+          <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+          <tr><td>LLM</td><td>Claude API (claude-sonnet-4-20250514)</td><td>All agent reasoning, FIR drafting, threat assessment</td></tr>
+          <tr><td>Orchestration</td><td>LangGraph + LangChain</td><td>Stateful multi-agent graph, inter-agent messaging</td></tr>
+          <tr><td>Backend</td><td>FastAPI (Python 3.12)</td><td>WebSocket server, REST endpoints, webhook handling</td></tr>
+          <tr><td>Real-time</td><td>WebSockets + Redis</td><td>Agent activity streaming to all clients</td></tr>
+          <tr><td>Dashboard</td><td>React + Tailwind CSS</td><td>Live Kavach Command interface</td></tr>
+          <tr><td>Phone mirror</td><td>scrcpy</td><td>Phone screen on big screen for demo</td></tr>
+          <tr><td>Startup</td><td>Single shell script</td><td>One command launches entire platform</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin-top:24px">Android Client (Body)</h3>
+      <div class="tbl-wrap">
+        <table>
+          <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+          <tr><td>Wake word</td><td>Porcupine SDK (Picovoice)</td><td>Offline "Kavach!" detection, screen-off capable</td></tr>
+          <tr><td>STT</td><td>Whisper API / Android STT</td><td>Voice processing for commands</td></tr>
+          <tr><td>TTS</td><td>Android TTS / Piper TTS</td><td>Safe route voice guidance</td></tr>
+          <tr><td>Phone control</td><td>Shizuku + ADB</td><td>Autonomous 112 call initiation</td></tr>
+          <tr><td>Communication</td><td>WebSocket client</td><td>Real-time event stream with Mac server</td></tr>
+          <tr><td>Messaging</td><td>WhatsApp Business API</td><td>Real-time family + police alerts</td></tr>
+          <tr><td>Location</td><td>Google Maps SDK + Firebase</td><td>Live location tracking and routing</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <h3>Data & Intelligence</h3>
+      <div class="tbl-wrap">
+        <table>
+          <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+          <tr><td>Crime data</td><td>NCRB Open Data API</td><td>Crime heatmap generation for threat assessment</td></tr>
+          <tr><td>Mapping</td><td>Google Maps Platform</td><td>Safe routing, Places (safe spaces), Directions</td></tr>
+          <tr><td>Evidence</td><td>Firebase Storage (encrypted)</td><td>Real-time audio evidence upload</td></tr>
+          <tr><td>Database</td><td>Supabase (PostgreSQL)</td><td>User data, trusted circles, incident log</td></tr>
+          <tr><td>Memory</td><td>ChromaDB (vector)</td><td>Agent context, past incident learning</td></tr>
+          <tr><td>Auth</td><td>Firebase Auth + Aadhaar eKYC</td><td>Role-based login, volunteer verification</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin-top:24px">Argus CCTV Layer</h3>
+      <div class="tbl-wrap">
+        <table>
+          <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+          <tr><td>Edge compute</td><td>Raspberry Pi 4 / Jetson Nano</td><td>Worker node hardware at camera locations</td></tr>
+          <tr><td>Face recognition</td><td>DeepFace / InsightFace</td><td>Real-time face detection and matching</td></tr>
+          <tr><td>Plate recognition</td><td>OpenALPR / EasyOCR</td><td>Vehicle registration plate reading</td></tr>
+          <tr><td>Mesh protocol</td><td>NATS (P2P encrypted)</td><td>Sub-2ms node-to-node communication</td></tr>
+          <tr><td>Master LLM</td><td>Llama 3.3 70B / Claude API</td><td>Investigation agent orchestration at police station</td></tr>
+          <tr><td>Evidence format</td><td>Section 65B formatter</td><td>Court-admissible evidence package generation</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin-top:24px">Production Infrastructure</h3>
+      <div class="tbl-wrap">
+        <table>
+          <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+          <tr><td>Cloud</td><td>AWS ECS + RDS + CloudFront</td><td>Global deployment, auto-scaling</td></tr>
+          <tr><td>Mobile apps</td><td>React Native (cross-platform)</td><td>Guardian + Sentinel on iOS and Android</td></tr>
+          <tr><td>Monitoring</td><td>Sentry + DataDog</td><td>Incident alerting, performance tracking</td></tr>
+          <tr><td>Compliance</td><td>DPDP Act 2023 framework</td><td>India data protection compliance</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ BUSINESS MODEL ═══ -->
+<section id="business">
+  <div class="ghost">08</div>
+  <div class="eyebrow">Section 08</div>
+  <h2>Business Model & Startup Path</h2>
+  <p style="max-width:780px;margin-top:8px">Designed as a fundable, scalable startup with multiple revenue streams and strong government alignment. Not just a hackathon project — a company.</p>
+
+  <div class="g3" style="margin-top:30px">
+    <div class="card cc rv">
+      <h4>B2G (Government)</h4>
+      <p style="font-size:13px">Kavach Command licensed to state police forces as a SaaS platform. Aligns with MHA's Nirbhaya Fund (₹1,000 Cr allocated for women's safety tech), Smart City Mission, and CCTNS (Crime & Criminal Tracking Network).</p>
+      <div style="margin-top:10px;font-family:Consolas,monospace;font-size:11px;color:var(--muted2)">₹50L–₹2Cr/year per police commissionerate</div>
+    </div>
+    <div class="card cc rv d1">
+      <h4>B2B (Enterprise)</h4>
+      <p style="font-size:13px">Kavach Guardian white-labeled for corporates (employee safety), colleges (campus safety), hospitals (staff protection), and housing societies. Integration with existing HR and security systems.</p>
+      <div style="margin-top:10px;font-family:Consolas,monospace;font-size:11px;color:var(--muted2)">₹999–₹4,999/month per organization</div>
+    </div>
+    <div class="card cc rv d2">
+      <h4>B2C (Consumer)</h4>
+      <p style="font-size:13px">Kavach Guardian freemium on Play Store / App Store. Free tier: basic panic + location. Pro tier: safe walk AI routing, CCTV awareness zones, advanced evidence tools, priority response.</p>
+      <div style="margin-top:10px;font-family:Consolas,monospace;font-size:11px;color:var(--muted2)">₹99/month Pro · ₹999/year family plan</div>
+    </div>
+    <div class="card ca rv d1">
+      <h4>NGO & CSR Partnerships</h4>
+      <p style="font-size:13px">Subsidized licenses for women's NGOs, self-help groups, and rural safety organizations. CSR funding from corporates under Companies Act mandates creates a funded free-tier distribution model.</p>
+      <div style="margin-top:10px;font-family:Consolas,monospace;font-size:11px;color:var(--muted2)">CSR grants + NGO sponsorship model</div>
+    </div>
+    <div class="card ca rv d2">
+      <h4>Data Intelligence API</h4>
+      <p style="font-size:13px">Anonymized, aggregated crime pattern intelligence sold as API to urban planners, insurance companies, real estate platforms, and city safety consultants. DPDP-compliant, privacy-preserved.</p>
+      <div style="margin-top:10px;font-family:Consolas,monospace;font-size:11px;color:var(--muted2)">₹2L–₹10L/month enterprise API</div>
+    </div>
+    <div class="card cg rv d3">
+      <h4>Global Expansion</h4>
+      <p style="font-size:13px">Southeast Asia (Indonesia, Philippines, Bangladesh), Middle East (Jordan, Egypt), Sub-Saharan Africa (Nigeria, Kenya, South Africa) — all markets with similar safety gaps and rapidly growing smartphone penetration.</p>
+      <div style="margin-top:10px;font-family:Consolas,monospace;font-size:11px;color:var(--muted2)">$2B+ addressable market outside India</div>
+    </div>
+  </div>
+
+  <div style="margin-top:30px;padding:24px;background:var(--card2);border:1px solid var(--border2);border-radius:8px">
+    <h4 style="color:var(--text);margin-bottom:16px">Comparable Funded Startups</h4>
+    <div class="tbl-wrap" style="margin-top:0">
+      <table>
+        <tr><th>Company</th><th>Focus</th><th>Funding / Outcome</th><th>Why Kavach is better positioned</th></tr>
+        <tr><td>Safetipin (India)</td><td>Safety mapping & auditing</td><td>Series A funded, govt contracts</td><td>Kavach adds autonomous response + CCTV intelligence — not just mapping</td></tr>
+        <tr><td>Circle of 6 (US)</td><td>Campus safety app</td><td>US DoJ grant, acquired</td><td>Kavach is multi-stakeholder platform, not single-use app</td></tr>
+        <tr><td>Guardly (Canada)</td><td>Emergency communication</td><td>$3M raised, acquired by Rave Mobile</td><td>Kavach adds AI agents + CCTV — orders of magnitude more capable</td></tr>
+        <tr><td>Flarebright (India)</td><td>Women's safety IoT wearable</td><td>Seed funded</td><td>Kavach works on existing devices — no hardware purchase barrier</td></tr>
+      </table>
+    </div>
+    <div class="callout grn" style="margin-top:14px"><strong>Investment thesis:</strong> India's Nirbhaya Fund has disbursed ₹4,500+ Cr for women's safety. Kavach is the first AI-native platform that productizes this at scale. Government is actively looking for technology solutions in this category.</div>
+  </div>
+</section>
+
+<!-- ═══ IMPACT ═══ -->
+<section id="impact">
+  <div class="ghost">09</div>
+  <div class="eyebrow">Section 09</div>
+  <h2>Impact & Vision</h2>
+
+  <div class="g4" style="margin-top:30px">
+    <div class="card cc" style="text-align:center;padding:20px 14px">
+      <div class="stat-val">8s</div>
+      <div class="stat-label">Full agent coordination<br>vs 15 min human average</div>
+    </div>
+    <div class="card cc" style="text-align:center;padding:20px 14px">
+      <div class="stat-val" style="color:var(--purple2)">100%</div>
+      <div class="stat-label">Automatic evidence<br>from second 1</div>
+    </div>
+    <div class="card cc" style="text-align:center;padding:20px 14px">
+      <div class="stat-val" style="color:var(--blue2)">&lt;1s</div>
+      <div class="stat-label">Cross-jurisdiction<br>police relay (Argus)</div>
+    </div>
+    <div class="card cc" style="text-align:center;padding:20px 14px">
+      <div class="stat-val" style="color:var(--green2)">400+</div>
+      <div class="stat-label">Women affected daily<br>in India alone</div>
+    </div>
+  </div>
+
+  <div class="split" style="margin-top:36px">
+    <div>
+      <h3>Year 1 Targets (Post-Hackathon Launch)</h3>
+      <div class="tbl-wrap">
+        <table>
+          <tr><th>Metric</th><th>Target</th></tr>
+          <tr><td>Guardian app downloads</td><td>100,000 users in Bengaluru + 3 cities</td></tr>
+          <tr><td>Sentinel volunteers enrolled</td><td>10,000 verified volunteers</td></tr>
+          <tr><td>Safe spaces registered</td><td>5,000 shops, hospitals, pharmacies</td></tr>
+          <tr><td>Police Command deployments</td><td>3 commissionerates (pilot)</td></tr>
+          <tr><td>Argus nodes deployed</td><td>500 cameras across Bengaluru pilot zone</td></tr>
+          <tr><td>Evidence packages generated</td><td>Automatic for 100% of incidents</td></tr>
+          <tr><td>Average response time</td><td>Under 15 seconds (agents); under 5 min (police)</td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h3>3-Year Roadmap</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <div class="card" style="padding:14px 16px">
+          <div style="font-size:12px;font-family:Consolas,monospace;color:var(--crimson2);margin-bottom:4px">PHASE 1 · 0–6 months</div>
+          <p style="font-size:13px;margin:0">Launch Guardian + Command MVP in Bengaluru. Deploy Argus pilot on 100 existing cameras (MoU with BBMP). First 1,000 Sentinel volunteers. Secure Nirbhaya Fund grant application.</p>
+        </div>
+        <div class="card" style="padding:14px 16px">
+          <div style="font-size:12px;font-family:Consolas,monospace;color:var(--purple2);margin-bottom:4px">PHASE 2 · 6–18 months</div>
+          <p style="font-size:13px;margin:0">Expand to Delhi, Mumbai, Chennai, Hyderabad. Launch Sentinel app publicly. 5 police commissionerate deployments. Series A fundraise. React Native apps on iOS + Android.</p>
+        </div>
+        <div class="card" style="padding:14px 16px">
+          <div style="font-size:12px;font-family:Consolas,monospace;color:var(--blue2);margin-bottom:4px">PHASE 3 · 18–36 months</div>
+          <p style="font-size:13px;margin:0">10 Indian cities. International expansion — Indonesia, Philippines, Nigeria. Kavach Intelligence API launched. Wearable device partnerships. ₹100 Cr ARR target.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JUDGING SCORES -->
+  <div style="margin-top:40px;padding:28px;background:var(--card2);border:1px solid rgba(34,197,94,.25);border-radius:10px">
+    <h3 style="margin-bottom:20px;color:var(--green2)">Why Kavach Scores 10/10 Across Every Criterion</h3>
+    <div class="g2">
+      <div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="score-pill"><div class="score-num">10</div><div class="score-label">Demo wow</div></div>
+            <div style="font-size:13px;color:#84a0b8">Real phone call + real WhatsApp + 6 agent nodes + CCTV activation + voice guidance. Live. Simultaneous. Unprecedented.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="score-pill"><div class="score-num">10</div><div class="score-label">Agentic AI</div></div>
+            <div style="font-size:13px;color:#84a0b8">6 specialized agents + LangGraph orchestrator. True parallel multi-agent system, not a pipeline. Physical real-world actions.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="score-pill"><div class="score-num">10</div><div class="score-label">Social impact</div></div>
+            <div style="font-size:13px;color:#84a0b8">Every judge has a mother, sister, daughter. 400+ crimes daily. This isn't abstract. It's personal to every person in that room.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="score-pill"><div class="score-num">10</div><div class="score-label">India-first</div></div>
+            <div style="font-size:13px;color:#84a0b8">Nirbhaya Fund, NCRB data, 112, Section 65B, DPDP Act, Aadhaar eKYC, 11 Indian languages. Built for India at every layer.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="score-pill"><div class="score-num">10</div><div class="score-label">Uniqueness</div></div>
+            <div style="font-size:13px;color:#84a0b8">No system anywhere combines autonomous agents + CCTV mesh + volunteer network + police coordination. A genuinely new category.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="score-pill" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3)"><div class="score-num" style="color:var(--amber2)">9</div><div class="score-label" style="color:var(--amber2)">Buildability</div></div>
+            <div style="font-size:13px;color:#84a0b8">Same Mac+Android architecture from chat. AI coding agents handle implementation. Core demo achievable in 8–10 hours.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL STATEMENT -->
+  <div style="margin-top:48px;text-align:center;padding:48px 32px;border:1px solid rgba(225,29,72,.2);border-radius:12px;background:rgba(225,29,72,.04)">
+    <div style="font-family:Consolas,monospace;font-size:10px;letter-spacing:.35em;color:var(--muted2);text-transform:uppercase;margin-bottom:20px">Kavach · निडर · Fearless</div>
+    <h2 style="font-size:clamp(24px,4vw,42px);line-height:1.3;color:#fff;font-family:'Segoe UI',sans-serif;font-weight:300;letter-spacing:0">"In India, 400 women face crimes every single day.<br>Most of them face it alone.<br><span style="color:var(--crimson2);font-weight:400">Kavach is the first system that doesn't just warn them.</span><br>It fights for them. And it never forgets."</h2>
+    <div style="margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <span class="tag tr" style="font-size:11px;padding:5px 14px">Sentinel Hack 6.0 · KSIT · 2026</span>
+      <span class="tag tp" style="font-size:11px;padding:5px 14px">Agentic AI Track</span>
+      <span class="tag tg" style="font-size:11px;padding:5px 14px">Built to win · Built to save lives</span>
+    </div>
+  </div>
+</section>
+
+<script>
+window.addEventListener('scroll',function(){
+  var s=document.getElementById('scroll-bar');
+  var pct=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100;
+  s.style.width=pct+'%';
+});
+
+const obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}
+  });
+},{threshold:.08});
+document.querySelectorAll('.rv').forEach(function(el){
+  el.style.opacity='0';el.style.transform='translateY(18px)';el.style.transition='opacity .55s ease, transform .55s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>

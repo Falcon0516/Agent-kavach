@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#02080f" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="KAVACH Guardian — Autonomous Women's Safety Platform" />
+    <title>KAVACH Guardian</title>
+    <style>
+      /* Prevent overscroll bounce on mobile */
+      html, body { overscroll-behavior: none; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Register service worker (skip during Vite dev HMR)
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          // Skip registration in dev mode (port 5173) to avoid HMR issues
+          if (window.location.port !== '5173') {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+[
+  {"name":"Manipal Hospital Hebbal","lat":13.0340,"lon":77.5730,"phone":"080-25023456"},
+  {"name":"Apollo Hospital Bannerghatta","lat":12.8991,"lon":77.5981,"phone":"080-26304050"},
+  {"name":"Victoria Hospital","lat":12.9592,"lon":77.5768,"phone":"080-26703591"},
+  {"name":"Fortis Hospital Cunningham Road","lat":12.9902,"lon":77.5924,"phone":"080-66214444"},
+  {"name":"MS Ramaiah Hospital","lat":13.0140,"lon":77.5614,"phone":"080-23360202"},
+  {"name":"St. Johns Medical College","lat":12.9371,"lon":77.6234,"phone":"080-22065001"},
+  {"name":"Narayana Health City","lat":12.8956,"lon":77.6497,"phone":"080-71222222"},
+  {"name":"Columbia Asia Whitefield","lat":12.9698,"lon":77.7375,"phone":"080-71782000"}
+]
