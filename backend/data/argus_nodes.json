@@ -1,18 +1,164 @@
 [
   {
     "node_id": "ARGUS-01",
-    "name": "Main Entrance",
-    "lat": 13.0827,
-    "lon": 77.5877,
+    "name": "Main Entrance — KSIT",
+    "lat": 12.8945,
+    "lon": 77.5615,
     "stream_url": "http://100.90.235.90:8080/video",
-    "status": "active"
+    "status": "active",
+    "face_detected_count": 3
   },
   {
     "node_id": "ARGUS-02",
-    "name": "Demo Stage Area",
-    "lat": 13.0828,
-    "lon": 77.5878,
+    "name": "Demo Stage Area — KSIT",
+    "lat": 12.8947,
+    "lon": 77.5617,
     "stream_url": "http://100.124.219.16:8080/video",
-    "status": "offline"
+    "status": "offline",
+    "face_detected_count": 1
+  },
+  {
+    "node_id": "CAM-03",
+    "name": "Yelahanka New Town Bus Stop",
+    "lat": 13.1001,
+    "lon": 77.5803,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 5
+  },
+  {
+    "node_id": "CAM-04",
+    "name": "Hebbal Flyover Junction",
+    "lat": 13.0358,
+    "lon": 77.5970,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 8
+  },
+  {
+    "node_id": "CAM-05",
+    "name": "Mekhri Circle Traffic Signal",
+    "lat": 13.0142,
+    "lon": 77.5839,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 6
+  },
+  {
+    "node_id": "CAM-06",
+    "name": "Rajajinagar Metro Station",
+    "lat": 13.0003,
+    "lon": 77.5497,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 9
+  },
+  {
+    "node_id": "CAM-07",
+    "name": "BEL Circle — New BEL Road",
+    "lat": 13.0314,
+    "lon": 77.5702,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 4
+  },
+  {
+    "node_id": "CAM-08",
+    "name": "Yeshwanthpur Junction",
+    "lat": 13.0238,
+    "lon": 77.5508,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 7
+  },
+  {
+    "node_id": "CAM-09",
+    "name": "MS Ramaiah Hospital Gate",
+    "lat": 13.0299,
+    "lon": 77.5688,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 5
+  },
+  {
+    "node_id": "CAM-10",
+    "name": "Malleshwaram 8th Cross",
+    "lat": 12.9992,
+    "lon": 77.5694,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 6
+  },
+  {
+    "node_id": "CAM-11",
+    "name": "Sadashivanagar Police Station",
+    "lat": 13.0103,
+    "lon": 77.5796,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 3
+  },
+  {
+    "node_id": "CAM-12",
+    "name": "Sankey Tank Road",
+    "lat": 13.0100,
+    "lon": 77.5700,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 4
+  },
+  {
+    "node_id": "CAM-13",
+    "name": "Seshadripuram College Gate",
+    "lat": 12.9888,
+    "lon": 77.5764,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 5
+  },
+  {
+    "node_id": "CAM-14",
+    "name": "Magadi Road Metro Station",
+    "lat": 12.9756,
+    "lon": 77.5554,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 6
+  },
+  {
+    "node_id": "CAM-15",
+    "name": "Uttarahalli Main Road",
+    "lat": 12.9035,
+    "lon": 77.5389,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 4
+  },
+  {
+    "node_id": "CAM-16",
+    "name": "Kengeri Satellite Town",
+    "lat": 12.9100,
+    "lon": 77.4800,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 3
+  },
+  {
+    "node_id": "CAM-17",
+    "name": "Cubbon Park Main Gate",
+    "lat": 12.9738,
+    "lon": 77.5906,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 7
+  },
+  {
+    "node_id": "CAM-18",
+    "name": "MG Road Metro Station",
+    "lat": 12.9755,
+    "lon": 77.6068,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 9
   }
 ]

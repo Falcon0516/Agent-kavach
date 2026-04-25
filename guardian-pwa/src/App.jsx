@@ -7,6 +7,7 @@ import ShakeTrigger from './components/ShakeTrigger';
 import VolumeButtonTrigger from './components/VolumeButtonTrigger';
 import StatusDisplay from './components/StatusDisplay';
 import MapView from './components/MapView';
+import GreenCorridorNav from './components/GreenCorridorNav';
 import TrustedContacts from './components/TrustedContacts';
 import SafeWalk from './components/SafeWalk';
 import { sendSMSFallback } from './components/SMSFallback';
@@ -183,12 +184,14 @@ export default function App() {
 
         {screen === 'navigate' && (
           <div className="h-full flex flex-col">
-            <div className="p-4 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(225,29,72,0.15)' }}>
-              <span className="text-lg">🧭</span>
-              <h2 className="text-sm font-bold tracking-wide" style={{ color: '#e11d48' }}>SAFE NAVIGATION</h2>
+            <div className="flex items-center gap-2 px-4 py-2.5 flex-shrink-0"
+              style={{ borderBottom: '1px solid rgba(34,197,94,0.15)' }}>
+              <span className="text-base">🧭</span>
+              <h2 className="text-xs font-bold tracking-widest uppercase"
+                style={{ color: '#22c55e' }}>Green Corridor Navigation</h2>
             </div>
-            <div className="flex-1">
-              <MapView showRouting={true} />
+            <div className="flex-1 overflow-hidden">
+              <GreenCorridorNav />
             </div>
           </div>
         )}

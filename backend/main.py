@@ -335,6 +335,18 @@ class RecordingCompleteRequest(BaseModel):
     duration_seconds: float = 0
 
 
+class GreenCorridorRequest(BaseModel):
+    dest_lat: float
+    dest_lon: float
+    time_slot: str = "night"
+
+
+class CorridorSummaryRequest(BaseModel):
+    route_id: str
+    time_slot: str = "night"
+    victim_context: str = ""
+
+
 class FlagThreatRequest(BaseModel):
     zone_id: str
     lat: float
@@ -757,6 +769,7 @@ async def map_data():
         "argus_nodes": _read_data("argus_nodes.json"),
         "safe_zones": _read_data("safe_zones.json"),
         "ncrb_hotspots": _read_data("ncrb_hotspots.json"),
+        "corridor_routes": _read_data("green_corridor_routes.json"),
     }
 
 
@@ -1044,6 +1057,98 @@ async def community_report(req: CommunityReport):
 async def get_community_reports():
     return community_reports_store
 
+
+# ── GET /api/corridor_routes ──────────────────────────────────────────────
+@app.get("/api/corridor_routes")
+async def corridor_routes():
+    """Return all predefined green corridor routes with their waypoints."""
+    routes = _read_data("green_corridor_routes.json")
+    return {"routes": routes, "count": len(routes)}
+
+
+# ── POST /api/green_corridor_summary ──────────────────────────────────────
+@app.post("/api/green_corridor_summary")
+async def green_corridor_summary(req: CorridorSummaryRequest):
+    """
+    Use Groq llama-3.3-70b to generate a plain-language corridor explanation.
+    Returns a 2-3 sentence summary explaining WHY this corridor is recommended.
+    """
+    from groq import AsyncGroq
+
+    routes = _read_data("green_corridor_routes.json")
+    route = next((r for r in routes if r["route_id"] == req.route_id), None)
+
+    if not route:
+        return {"summary": "Route data unavailable.", "safety_score": 0.5}
+
+    cameras_count = len(route.get("cameras_on_route", []))
+    hotspots_avoided = len(route.get("hotspots_avoided", []))
+    safety_pct = int(route.get("safety_score", 0.75) * 100)
+    highlights = route.get("corridor_highlights", [])
+    highlights_text = "; ".join(highlights[:3])
+    time_label = {
+        "morning": "this morning",
+        "afternoon": "this afternoon",
+        "night": "tonight"
+    }.get(req.time_slot, "now")
+    victim_ctx = f" The user mentioned: '{req.victim_context}'." if req.victim_context else ""
+
+    prompt = (
+        f"You are KAVACH, an AI women's safety assistant. A woman is planning to travel "
+        f"from her current location to {route['destination_name']} ({route['distance_km']}km, "
+        f"~{route['walk_minutes']} min walk) {time_label}.{victim_ctx}\n\n"
+        f"Route analysis:\n"
+        f"- Safety score: {safety_pct}%\n"
+        f"- Cameras covering this corridor: {cameras_count} Argus nodes\n"
+        f"- NCRB hotspot zones avoided: {hotspots_avoided}\n"
+        f"- Key corridor features: {highlights_text}\n"
+        f"- Time slot: {req.time_slot}\n\n"
+        f"Write a KAVACH Green Corridor summary in exactly 2-3 sentences. "
+        f"Tone: calm, factual, reassuring. Like a trusted safety advisor. "
+        f"Mention: how many cameras are on this route, what unsafe zones are avoided, and one "
+        f"specific safety tip for this destination. "
+        f"Do NOT use markdown, bullet points, or headers. Plain sentences only. "
+        f"Start with: \"Your green corridor to {route['destination_short']} \""
+    )
+
+    try:
+        groq_key = (
+            os.getenv("GROQ_KEY_1") or
+            os.getenv("GROQ_KEY_2") or
+            os.getenv("GROQ_KEY_3") or
+            os.getenv("GROQ_KEY_4") or ""
+        )
+        if not groq_key:
+            raise ValueError("No Groq key configured")
+
+        client = AsyncGroq(api_key=groq_key)
+        response = await client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.4,
+            max_tokens=120,
+        )
+        summary = response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.warning(f"Groq corridor summary failed: {e}")
+        summary = (
+            f"Your green corridor to {route['destination_short']} passes through "
+            f"{cameras_count} Argus camera zones, ensuring continuous surveillance coverage. "
+            f"This route avoids {hotspots_avoided} known NCRB crime hotspot zones. "
+            f"{highlights[0] if highlights else 'Stay on the recommended path for maximum safety.'}"
+        )
+
+    return {
+        "route_id": req.route_id,
+        "summary": summary,
+        "safety_score": route.get("safety_score", 0.75),
+        "safety_pct": safety_pct,
+        "cameras_count": cameras_count,
+        "hotspots_avoided": hotspots_avoided,
+        "destination_name": route["destination_name"],
+        "distance_km": route["distance_km"],
+        "walk_minutes": route["walk_minutes"],
+    }
 
 # â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # ENTRY POINT

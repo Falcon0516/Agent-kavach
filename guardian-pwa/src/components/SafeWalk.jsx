@@ -2,11 +2,31 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const API_BASE = `http://${import.meta.env.VITE_MSI_IP || 'localhost'}:8000`;
 
+// ── SAFEWALK PERSISTENCE KEY ──────────────────────────────────────
+const WALK_STORAGE_KEY = 'kavach_safewalk_state';
+
+function saveWalkState(data) {
+  try { localStorage.setItem(WALK_STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+}
+function clearWalkState() {
+  try { localStorage.removeItem(WALK_STORAGE_KEY); } catch (e) {}
+}
+function loadWalkState() {
+  try {
+    const raw = localStorage.getItem(WALK_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
 export default function SafeWalk({ onTriggerSOS }) {
-  const [active, setActive] = useState(false);
-  const [destination, setDestination] = useState('');
-  const [etaMinutes, setEtaMinutes] = useState(15);
-  const [elapsed, setElapsed] = useState(0);
+  // ── Hydrate from localStorage on mount ─────────────────────────
+  const saved = loadWalkState();
+
+  const [active, setActive] = useState(saved?.active || false);
+  const [destination, setDestination] = useState(saved?.destination || '');
+  const [etaMinutes, setEtaMinutes] = useState(saved?.etaMinutes || 15);
+  const [elapsed, setElapsed] = useState(saved?.elapsed || 0);
   const [lastPos, setLastPos] = useState(null);
   const [routePath, setRoutePath] = useState([]);
   const [deviationWarning, setDeviationWarning] = useState(false);
@@ -16,10 +36,55 @@ export default function SafeWalk({ onTriggerSOS }) {
   const watchRef = useRef(null);
   const startTimeRef = useRef(null);
 
+  // ── Restore active walk on remount ────────────────────────────
+  useEffect(() => {
+    const saved = loadWalkState();
+    if (!saved?.active) return;
+
+    const alreadyElapsed = saved.elapsed || 0;
+    const adjustedStart = Date.now() - (alreadyElapsed * 1000);
+    startTimeRef.current = adjustedStart;
+
+    intervalRef.current = setInterval(() => {
+      const newElapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      setElapsed(newElapsed);
+      if (newElapsed % 5 === 0) {
+        saveWalkState({
+          active: true, destination: saved.destination,
+          etaMinutes: saved.etaMinutes, elapsed: newElapsed,
+          startTimestamp: new Date(startTimeRef.current).toISOString(),
+        });
+      }
+    }, 1000);
+
+    if (navigator.geolocation) {
+      watchRef.current = navigator.geolocation.watchPosition(
+        (pos) => {
+          const newPos = { lat: pos.coords.latitude, lon: pos.coords.longitude, ts: Date.now() };
+          setLastPos(newPos);
+          setRoutePath(prev => [...prev, newPos]);
+        },
+        () => {},
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+      );
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (watchRef.current) navigator.geolocation.clearWatch(watchRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── Start Safe Walk ──
   const startWalk = () => {
     if (!destination.trim()) return;
     setActive(true);
+    // ── Persist to localStorage so state survives tab switches ──
+    saveWalkState({
+      active: true, destination, etaMinutes,
+      elapsed: 0, startTimestamp: new Date().toISOString(),
+    });
     setElapsed(0);
     setRoutePath([]);
     setDeviationWarning(false);
@@ -80,13 +145,24 @@ export default function SafeWalk({ onTriggerSOS }) {
 
     // Elapsed timer
     intervalRef.current = setInterval(() => {
-      setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      const newElapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      setElapsed(newElapsed);
+      // Keep localStorage in sync every 5 seconds
+      if (newElapsed % 5 === 0) {
+        saveWalkState({
+          active: true, destination, etaMinutes,
+          elapsed: newElapsed,
+          startTimestamp: new Date(startTimeRef.current).toISOString(),
+        });
+      }
     }, 1000);
   };
 
   // ── Stop Safe Walk ──
   const stopWalk = (reason = 'manual') => {
     setActive(false);
+    // ── Clear persisted walk state ──────────────────────────────
+    clearWalkState();
     if (watchRef.current) navigator.geolocation.clearWatch(watchRef.current);
     if (intervalRef.current) clearInterval(intervalRef.current);
 
