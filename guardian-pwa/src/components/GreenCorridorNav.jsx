@@ -87,6 +87,7 @@ export default function GreenCorridorNav() {
   const [pinDropMode, setPinDropMode] = useState(false);
   const [manualDest, setManualDest] = useState(null);
   const [manualRouteCoords, setManualRouteCoords] = useState(null);
+  const [manualCameraIds, setManualCameraIds] = useState([]);
   const [timeSlot, setTimeSlot] = useState(() => {
     const h = new Date().getHours();
     if (h >= 6 && h < 14) return 'morning';
@@ -183,6 +184,7 @@ export default function GreenCorridorNav() {
   const handlePin = async ([lat, lon]) => {
     setManualDest([lat, lon]);
     setManualRouteCoords(null);
+    setManualCameraIds([]);
     setPinDropMode(false);
 
     // Try to find nearest predefined route (within ~3km)
@@ -227,6 +229,8 @@ export default function GreenCorridorNav() {
         const nearbyCams = cameras.filter(c => {
           return coords.some(pt => Math.sqrt((c.lat - pt[0])**2 + (c.lon - pt[1])**2) < maxDev);
         });
+        
+        setManualCameraIds(nearbyCams.map(c => c.node_id));
 
         setSummary({
           summary: `Custom destination pinned at ${lat.toFixed(4)}, ${lon.toFixed(4)}. Found an active road-following route. This path passes near ${nearbyCams.length} camera coverage zones. For best safety, stay within the illuminated main roads shown on the map.`,
@@ -337,7 +341,10 @@ export default function GreenCorridorNav() {
   const corridorWaypoints = getCorridorWaypoints();
 
   // ── Cameras that are part of the selected corridor ───────────────────
-  const corridorCameraIds = new Set(selectedRoute?.cameras_on_route || []);
+  const corridorCameraIds = new Set([
+    ...(selectedRoute?.cameras_on_route || []),
+    ...manualCameraIds
+  ]);
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#02080f' }}>
@@ -511,6 +518,42 @@ export default function GreenCorridorNav() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* ── LIVE CAMERA FEEDS (Only for cameras on selected route) ── */}
+      {corridorCameraIds.size > 0 && (
+        <div className="px-3 pb-2">
+          <div className="text-[9px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">
+            Live Route Coverage
+          </div>
+          <div className="flex gap-2 overflow-x-auto hide-scroll pb-1" style={{ scrollSnapType: 'x mandatory' }}>
+            {cameras.filter(c => corridorCameraIds.has(c.node_id) && c.stream_url).length > 0 ? (
+              cameras.filter(c => corridorCameraIds.has(c.node_id) && c.stream_url).map(cam => (
+                <div key={cam.node_id} className="relative flex-shrink-0 snap-start w-[140px] h-[90px] rounded-lg overflow-hidden"
+                  style={{ border: '1px solid rgba(34,197,94,0.3)', background: '#000' }}>
+                  <img src={cam.stream_url} className="w-full h-full object-cover opacity-80" alt={cam.name} 
+                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                  <div className="hidden absolute inset-0 items-center justify-center text-[8px] text-gray-500">
+                    Feed Offline
+                  </div>
+                  <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold"
+                    style={{ background: 'rgba(0,0,0,0.6)', color: '#22c55e' }}>
+                    🔴 LIVE
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 p-1.5 text-[8px] text-white truncate"
+                    style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+                    {cam.name}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="w-full text-center py-3 text-[10px] rounded-lg"
+                style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.1)', color: '#64748b' }}>
+                No active video feeds on this specific route segment.
+              </div>
+            )}
+          </div>
         </div>
       )}
 
