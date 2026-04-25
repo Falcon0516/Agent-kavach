@@ -225,7 +225,8 @@ export default function GreenCorridorNav() {
         const walkMin = Math.round(route.duration / 60);
 
         // Find cameras within ~200m of any point on this road route
-        const maxDev = 0.002;
+        // Find cameras within ~500m of any point on this road route
+        const maxDev = 0.005;
         const nearbyCams = cameras.filter(c => {
           return coords.some(pt => Math.sqrt((c.lat - pt[0])**2 + (c.lon - pt[1])**2) < maxDev);
         });
@@ -249,10 +250,17 @@ export default function GreenCorridorNav() {
       // Fallback to straight-line generator if OSRM fails
       const fallback = computeFallbackRoute(userPos, [lat, lon], cameras);
       setManualRouteCoords(fallback);
+      
+      const maxDevFallback = 0.005;
+      const nearbyCams = cameras.filter(c => {
+        return fallback.some(pt => Math.sqrt((c.lat - pt[0])**2 + (c.lon - pt[1])**2) < maxDevFallback);
+      });
+      setManualCameraIds(nearbyCams.map(c => c.node_id));
+
       setSummary({
-        summary: `Custom destination pinned. Could not fetch road network, showing direct fallback route.`,
-        safety_pct: 50,
-        cameras_count: 0,
+        summary: `Custom destination pinned. Could not fetch road network, showing direct fallback route. This path passes near ${nearbyCams.length} camera zones.`,
+        safety_pct: Math.min(85, 45 + nearbyCams.length * 5),
+        cameras_count: nearbyCams.length,
         hotspots_avoided: 0,
         destination_name: 'Custom Pin',
         distance_km: (Math.sqrt((userPos[0] - lat) ** 2 + (userPos[1] - lon) ** 2) * 111).toFixed(1),
