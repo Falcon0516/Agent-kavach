@@ -536,12 +536,19 @@ export default function GreenCorridorNav() {
             Live Route Coverage
           </div>
           <div className="flex gap-2 overflow-x-auto hide-scroll pb-1" style={{ scrollSnapType: 'x mandatory' }}>
-            {cameras.filter(c => corridorCameraIds.has(c.node_id) && c.stream_url).length > 0 ? (
-              cameras.filter(c => corridorCameraIds.has(c.node_id) && c.stream_url).map(cam => (
+            {cameras.filter(c => corridorCameraIds.has(c.node_id)).length > 0 ? (
+              cameras.filter(c => corridorCameraIds.has(c.node_id)).map(cam => (
                 <div key={cam.node_id} className="relative flex-shrink-0 snap-start w-[140px] h-[90px] rounded-lg overflow-hidden"
-                  style={{ border: '1px solid rgba(34,197,94,0.3)', background: '#000' }}>
-                  <img src={cam.stream_url} className="w-full h-full object-cover opacity-80" alt={cam.name} 
-                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                  style={{ border: '1px solid rgba(34,197,94,0.3)', background: '#0f172a' }}>
+                  {cam.stream_url ? (
+                    <img src={cam.stream_url} className="w-full h-full object-cover opacity-80" alt={cam.name} 
+                      onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                  ) : (
+                    <div className="w-full h-full opacity-40 flex items-center justify-center flex-col" 
+                      style={{ background: 'repeating-linear-gradient(0deg, #1e293b, #1e293b 1px, #0f172a 1px, #0f172a 2px)' }}>
+                       <span className="text-[10px] text-gray-500 font-mono tracking-widest">CCTV_FEED</span>
+                    </div>
+                  )}
                   <div className="hidden absolute inset-0 items-center justify-center text-[8px] text-gray-500">
                     Feed Offline
                   </div>

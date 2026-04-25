@@ -159,6 +159,60 @@
     "lon": 77.6068,
     "stream_url": "",
     "status": "dummy",
+    "face_detected_count": 8
+  },
+  {
+    "node_id": "CAM-19",
+    "name": "Koramangala Sony World Signal",
+    "lat": 12.9340,
+    "lon": 77.6250,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 12
+  },
+  {
+    "node_id": "CAM-20",
+    "name": "Agara Junction",
+    "lat": 12.9230,
+    "lon": 77.6460,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 6
+  },
+  {
+    "node_id": "CAM-21",
+    "name": "Bellandur Gate",
+    "lat": 12.9270,
+    "lon": 77.6690,
+    "stream_url": "",
+    "status": "dummy",
     "face_detected_count": 9
+  },
+  {
+    "node_id": "CAM-22",
+    "name": "Marathahalli Bridge",
+    "lat": 12.9560,
+    "lon": 77.6980,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 14
+  },
+  {
+    "node_id": "CAM-23",
+    "name": "BTM Layout Silk Board",
+    "lat": 12.9170,
+    "lon": 77.6220,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 11
+  },
+  {
+    "node_id": "CAM-24",
+    "name": "JP Nagar Central",
+    "lat": 12.9080,
+    "lon": 77.5920,
+    "stream_url": "",
+    "status": "dummy",
+    "face_detected_count": 5
   }
 ]
